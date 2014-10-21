@@ -1,3 +1,0 @@
-The syslog4j fork from Graylog2. This is used since 0.10.0. The original code was very "special" and no actions were taken to improve it. This is planned to be replaced completely in future versions.
-
-http://syslog4j.org/
