@@ -24,6 +24,7 @@ public class StructuredSyslogServerEventTest {
 
     @Test
     public void testStructured1() throws Exception {
+        // Message from: https://tools.ietf.org/html/rfc5424#section-6.5
         final String message = "<165>1 2012-12-25T22:14:15.003Z mymachine.example.com evntslog - ID47 [exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"] BOMAn application event log entry";
 
         final StructuredSyslogServerEvent event = buildEvent(message);
@@ -55,6 +56,8 @@ public class StructuredSyslogServerEventTest {
 
     @Test
     public void testStructuredSyslogNg1() throws Exception {
+        // Message from: syslog-ng-core 3.5.3-1 package in Ubuntu 14.04 (default config)
+        // Manually added ".000" to timestamp!
         final String message = "<45>1 2014-10-21T10:21:09.000+00:00 c4dc57ba1ebb syslog-ng 7120 - [meta sequenceId=\"1\"] syslog-ng starting up; version='3.5.3'";
 
         final StructuredSyslogServerEvent event = buildEvent(message);
