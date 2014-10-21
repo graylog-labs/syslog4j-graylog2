@@ -138,4 +138,34 @@ public class StructuredSyslogServerEventTest {
         assertEquals(event.getStructuredMessage().getMessageId(), null);
         assertEquals(event.getStructuredMessage().getMessage(), "syslog-ng starting up; version='3.5.3'");
     }
+
+    @Test
+    public void testStructuredSyslogNgNoMillisecTimestamp() throws Exception {
+        // Message from: syslog-ng-core 3.5.3-1 package in Ubuntu 14.04 (default config)
+        final String message = "<45>1 2014-10-21T10:21:09+00:00 c4dc57ba1ebb syslog-ng 7120 - [meta sequenceId=\"1\"] syslog-ng starting up; version='3.5.3'";
+
+        final StructuredSyslogServerEvent event = buildEvent(message);
+
+        Map<String, Object> structuredData = new HashMap<String, Object>() {
+            {
+                put("meta", new HashMap<String, String>() {
+                    {
+                        put("sequenceId", "1");
+                    }
+                });
+            }
+        };
+
+        assertEquals(event.getApplicationName(), "syslog-ng");
+        assertEquals(event.getDateTime(), new DateTime("2014-10-21T10:21:09.000Z"));
+        assertEquals(event.getFacility(), 5);
+        assertEquals(event.getHost(), "c4dc57ba1ebb");
+        assertEquals(event.getLevel(), 5);
+        assertEquals(event.getMessage(), "- [meta sequenceId=\"1\"] syslog-ng starting up; version='3.5.3'");
+        assertEquals(event.getProcessId(), "7120");
+
+        assertEquals(event.getStructuredMessage().getStructuredData(), structuredData);
+        assertEquals(event.getStructuredMessage().getMessageId(), null);
+        assertEquals(event.getStructuredMessage().getMessage(), "syslog-ng starting up; version='3.5.3'");
+    }
 }

@@ -1,13 +1,13 @@
 package org.graylog2.syslog4j.server.impl.event.structured;
 
-import java.net.InetAddress;
-
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.graylog2.syslog4j.SyslogConstants;
 import org.graylog2.syslog4j.impl.message.structured.StructuredSyslogMessage;
 import org.graylog2.syslog4j.server.impl.event.SyslogServerEvent;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
+
+import java.net.InetAddress;
 
 /**
  * SyslogServerStructuredEvent provides an implementation of the
@@ -51,7 +51,7 @@ public class StructuredSyslogServerEvent extends SyslogServerEvent {
 
     public DateTimeFormatter getDateTimeFormatter() {
         if (dateTimeFormatter == null) {
-            this.dateTimeFormatter = ISODateTimeFormat.dateTime();
+            this.dateTimeFormatter = ISODateTimeFormat.dateTimeParser();
         }
 
         return dateTimeFormatter;
