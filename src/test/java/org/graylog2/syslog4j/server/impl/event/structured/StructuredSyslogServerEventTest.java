@@ -55,6 +55,45 @@ public class StructuredSyslogServerEventTest {
     }
 
     @Test
+    public void testStructuredWithOnlyStructuredData() throws Exception {
+        // Message from: https://tools.ietf.org/html/rfc5424#section-6.5
+        final String message = "<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog - ID47 [exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"][examplePriority@32473 class=\"high\"]";
+
+        final StructuredSyslogServerEvent event = buildEvent(message);
+
+        Map<String, Object> structuredData = new HashMap<String, Object>() {
+            {
+                put("exampleSDID@32473", new HashMap<String, String>() {
+                    {
+                        put("eventSource", "Application");
+                        put("eventID", "1011");
+                        put("iut", "3");
+                    }
+                });
+
+                put("examplePriority@32473", new HashMap<String, String>() {
+                    {
+                        put("class", "high");
+                    }
+                });
+            }
+        };
+
+        assertEquals(event.getApplicationName(), "evntslog");
+        assertEquals(event.getDateTime(), new DateTime("2003-10-11T22:14:15.003Z"));
+        assertEquals(event.getFacility(), 20);
+        assertEquals(event.getHost(), "mymachine.example.com");
+        assertEquals(event.getLevel(), 5);
+        assertEquals(event.getMessage(), "ID47 [exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"][examplePriority@32473 class=\"high\"]");
+        assertEquals(event.getProcessId(), null);
+
+        assertEquals(event.getStructuredMessage().getStructuredData(), structuredData);
+        assertEquals(event.getStructuredMessage().getMessageId(), "ID47");
+        assertEquals(event.getStructuredMessage().getMessage(), "");
+    }
+
+
+    @Test
     public void testStructuredWithoutStructuredData() throws Exception {
         // Message from: https://tools.ietf.org/html/rfc5424#section-6.5
         final String message = "<165>1 2003-08-24T05:14:15.000003-07:00 192.0.2.1 myproc 8710 - - %% It's time to make the do-nuts.";
