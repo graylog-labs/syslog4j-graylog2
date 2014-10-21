@@ -11,96 +11,96 @@ import org.graylog2.syslog4j.impl.message.structured.StructuredSyslogMessage;
  * than the syslog maximum message length (1024 bytes including the header). It
  * adds support for structured syslog messages as specified by
  * draft-ietf-syslog-protocol-23. More information here:
- * 
+ * <p/>
  * <p>http://tools.ietf.org/html/draft-ietf-syslog-protocol-23</p>
- * 
+ * <p/>
  * <p>Those wishing to replace (or improve upon) this implementation
  * can write a custom SyslogMessageProcessorIF and set it per
  * instance via the SyslogIF.setStructuredMessageProcessor(..) method or set it globally
  * via the StructuredSyslogMessageProcessor.setDefault(..) method.</p>
- * 
+ * <p/>
  * <p>
  * Syslog4j is licensed under the Lesser GNU Public License v2.1. A copy of the
  * LGPL license is available in the META-INF folder in all distributions of
  * Syslog4j and in the base directory of the "doc" ZIP.
  * </p>
- * 
+ *
  * @author Manish Motwani
  * @version $Id: StructuredSyslogMessageProcessor.java,v 1.4 2011/01/11 05:11:13 cvs Exp $
  */
 public class StructuredSyslogMessageProcessor extends AbstractSyslogMessageProcessor {
-	private static final long serialVersionUID = -1563777226913475257L;
-	
-	public static String VERSION = "1";
+    private static final long serialVersionUID = -1563777226913475257L;
 
-	private static final StructuredSyslogMessageProcessor INSTANCE = new StructuredSyslogMessageProcessor();
-	protected static StructuredSyslogMessageProcessor defaultInstance = INSTANCE;
-	
-	private String applicationName = STRUCTURED_DATA_APP_NAME_DEFAULT_VALUE;
-	private String processId = STRUCTURED_DATA_PROCESS_ID_DEFAULT_VALUE;
-	
-	private DateTimeFormatter dateTimeFormatter = ISODateTimeFormat.dateTime();
+    public static String VERSION = "1";
 
-	public static void setDefault(StructuredSyslogMessageProcessor messageProcessor) {
-		if (messageProcessor != null) {
-			defaultInstance = messageProcessor;
-		}
-	}
-	
-	public static StructuredSyslogMessageProcessor getDefault() {
-		return defaultInstance;
-	}
-	
-	public StructuredSyslogMessageProcessor() {
-		super();
-	}
+    private static final StructuredSyslogMessageProcessor INSTANCE = new StructuredSyslogMessageProcessor();
+    protected static StructuredSyslogMessageProcessor defaultInstance = INSTANCE;
 
-	public StructuredSyslogMessageProcessor(final String applicationName) {
-		super();
-		this.applicationName = applicationName;
-	}
+    private String applicationName = STRUCTURED_DATA_APP_NAME_DEFAULT_VALUE;
+    private String processId = STRUCTURED_DATA_PROCESS_ID_DEFAULT_VALUE;
 
-	public DateTimeFormatter getDateTimeFormatter() {
-		return dateTimeFormatter;
-	}
+    private DateTimeFormatter dateTimeFormatter = ISODateTimeFormat.dateTime();
 
-	public void setDateTimeFormatter(DateTimeFormatter dateTimeFormatter) {
-		this.dateTimeFormatter = dateTimeFormatter;
-	}
+    public static void setDefault(StructuredSyslogMessageProcessor messageProcessor) {
+        if (messageProcessor != null) {
+            defaultInstance = messageProcessor;
+        }
+    }
 
-	public String getApplicationName() {
-		return this.applicationName;
-	}
+    public static StructuredSyslogMessageProcessor getDefault() {
+        return defaultInstance;
+    }
 
-	public void setApplicationName(String applicationName) {
-		this.applicationName = applicationName;
-	}
+    public StructuredSyslogMessageProcessor() {
+        super();
+    }
 
-	public String getProcessId() {
-		return this.processId;
-	}
+    public StructuredSyslogMessageProcessor(final String applicationName) {
+        super();
+        this.applicationName = applicationName;
+    }
 
-	public void setProcessId(String processId) {
-		this.processId = processId;
-	}
+    public DateTimeFormatter getDateTimeFormatter() {
+        return dateTimeFormatter;
+    }
 
-	public String createSyslogHeader(final int facility, final int level, String localName, final boolean sendLocalTimestamp, final boolean sendLocalName) {
-		final StringBuffer buffer = new StringBuffer();
+    public void setDateTimeFormatter(DateTimeFormatter dateTimeFormatter) {
+        this.dateTimeFormatter = dateTimeFormatter;
+    }
 
-		appendPriority(buffer,facility,level);
-		buffer.append(VERSION);
-		buffer.append(' ');
+    public String getApplicationName() {
+        return this.applicationName;
+    }
 
-		getDateTimeFormatter().printTo(buffer,System.currentTimeMillis());
-		buffer.append(' ');
+    public void setApplicationName(String applicationName) {
+        this.applicationName = applicationName;
+    }
 
-		appendLocalName(buffer,localName);
+    public String getProcessId() {
+        return this.processId;
+    }
 
-		buffer.append(StructuredSyslogMessage.nilProtect(this.applicationName))
-				.append(' ');
+    public void setProcessId(String processId) {
+        this.processId = processId;
+    }
 
-		buffer.append(StructuredSyslogMessage.nilProtect(this.processId)).append(' ');
-		
-		return buffer.toString();
-	}
+    public String createSyslogHeader(final int facility, final int level, String localName, final boolean sendLocalTimestamp, final boolean sendLocalName) {
+        final StringBuffer buffer = new StringBuffer();
+
+        appendPriority(buffer, facility, level);
+        buffer.append(VERSION);
+        buffer.append(' ');
+
+        getDateTimeFormatter().printTo(buffer, System.currentTimeMillis());
+        buffer.append(' ');
+
+        appendLocalName(buffer, localName);
+
+        buffer.append(StructuredSyslogMessage.nilProtect(this.applicationName))
+                .append(' ');
+
+        buffer.append(StructuredSyslogMessage.nilProtect(this.processId)).append(' ');
+
+        return buffer.toString();
+    }
 }

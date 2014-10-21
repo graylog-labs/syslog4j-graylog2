@@ -5,152 +5,152 @@ import org.graylog2.syslog4j.impl.net.AbstractNetSyslogConfig;
 import org.graylog2.syslog4j.util.SyslogUtility;
 
 /**
-* TCPNetSyslogConfig is an extension of AbstractNetSyslogConfig that provides
-* configuration support for TCP/IP-based syslog clients.
-* 
-* <p>Syslog4j is licensed under the Lesser GNU Public License v2.1.  A copy
-* of the LGPL license is available in the META-INF folder in all
-* distributions of Syslog4j and in the base directory of the "doc" ZIP.</p>
-* 
-* @author &lt;syslog4j@productivity.org&gt;
-* @version $Id: TCPNetSyslogConfig.java,v 1.18 2010/10/29 03:14:12 cvs Exp $
-*/
+ * TCPNetSyslogConfig is an extension of AbstractNetSyslogConfig that provides
+ * configuration support for TCP/IP-based syslog clients.
+ * <p/>
+ * <p>Syslog4j is licensed under the Lesser GNU Public License v2.1.  A copy
+ * of the LGPL license is available in the META-INF folder in all
+ * distributions of Syslog4j and in the base directory of the "doc" ZIP.</p>
+ *
+ * @author &lt;syslog4j@productivity.org&gt;
+ * @version $Id: TCPNetSyslogConfig.java,v 1.18 2010/10/29 03:14:12 cvs Exp $
+ */
 public class TCPNetSyslogConfig extends AbstractNetSyslogConfig implements TCPNetSyslogConfigIF {
-	private static final long serialVersionUID = 9023152050686365460L;
-	
-	public static byte[] SYSTEM_DELIMITER_SEQUENCE = null;
-	
-	static {
-		String delimiterSequence = System.getProperty("line.separator");
-		
-		SYSTEM_DELIMITER_SEQUENCE = delimiterSequence.getBytes();
-		
-		if (SYSTEM_DELIMITER_SEQUENCE == null || SYSTEM_DELIMITER_SEQUENCE.length < 1) {
-			SYSTEM_DELIMITER_SEQUENCE = SyslogConstants.TCP_DELIMITER_SEQUENCE_DEFAULT;
-		}
-	}
-	
-	protected byte[] delimiterSequence = SYSTEM_DELIMITER_SEQUENCE;
-	
-	protected boolean persistentConnection = TCP_PERSISTENT_CONNECTION_DEFAULT;
-	
-	protected boolean soLinger = TCP_SO_LINGER_DEFAULT;
-	protected int soLingerSeconds = TCP_SO_LINGER_SECONDS_DEFAULT; 
-	
-	protected boolean keepAlive = TCP_KEEP_ALIVE_DEFAULT;
-	
-	protected boolean reuseAddress = TCP_REUSE_ADDRESS_DEFAULT;
-	
-	protected boolean setBufferSize = TCP_SET_BUFFER_SIZE_DEFAULT;
-	
-	protected int freshConnectionInterval = TCP_FRESH_CONNECTION_INTERVAL_DEFAULT;
-	
-	public TCPNetSyslogConfig() {
-		initialize();
-	}
-	
-	protected void initialize() {
-		//
-	}
+    private static final long serialVersionUID = 9023152050686365460L;
 
-	public TCPNetSyslogConfig(int facility, String host, int port) {
-		super(facility, host, port);
-		initialize();
-	}
+    public static byte[] SYSTEM_DELIMITER_SEQUENCE = null;
 
-	public TCPNetSyslogConfig(int facility, String host) {
-		super(facility, host);
-		initialize();
-	}
+    static {
+        String delimiterSequence = System.getProperty("line.separator");
 
-	public TCPNetSyslogConfig(int facility) {
-		super(facility);
-		initialize();
-	}
+        SYSTEM_DELIMITER_SEQUENCE = delimiterSequence.getBytes();
 
-	public TCPNetSyslogConfig(String host, int port) {
-		super(host, port);
-		initialize();
-	}
+        if (SYSTEM_DELIMITER_SEQUENCE == null || SYSTEM_DELIMITER_SEQUENCE.length < 1) {
+            SYSTEM_DELIMITER_SEQUENCE = SyslogConstants.TCP_DELIMITER_SEQUENCE_DEFAULT;
+        }
+    }
 
-	public TCPNetSyslogConfig(String host) {
-		super(host);
-		initialize();
-	}
+    protected byte[] delimiterSequence = SYSTEM_DELIMITER_SEQUENCE;
 
-	public Class getSyslogClass() {
-		return TCPNetSyslog.class;
-	}
-	
-	public byte[] getDelimiterSequence() {
-		return this.delimiterSequence;
-	}
+    protected boolean persistentConnection = TCP_PERSISTENT_CONNECTION_DEFAULT;
 
-	public void setDelimiterSequence(byte[] delimiterSequence) {
-		this.delimiterSequence = delimiterSequence;
-	}
+    protected boolean soLinger = TCP_SO_LINGER_DEFAULT;
+    protected int soLingerSeconds = TCP_SO_LINGER_SECONDS_DEFAULT;
 
-	public void setDelimiterSequence(String delimiterSequence) {
-		this.delimiterSequence = SyslogUtility.getBytes(this,delimiterSequence);
-	}
+    protected boolean keepAlive = TCP_KEEP_ALIVE_DEFAULT;
 
-	public boolean isPersistentConnection() {
-		return this.persistentConnection;
-	}
+    protected boolean reuseAddress = TCP_REUSE_ADDRESS_DEFAULT;
 
-	public void setPersistentConnection(boolean persistentConnection) {
-		this.persistentConnection = persistentConnection;
-	}
+    protected boolean setBufferSize = TCP_SET_BUFFER_SIZE_DEFAULT;
 
-	public boolean isSoLinger() {
-		return this.soLinger;
-	}
+    protected int freshConnectionInterval = TCP_FRESH_CONNECTION_INTERVAL_DEFAULT;
 
-	public void setSoLinger(boolean soLinger) {
-		this.soLinger = soLinger;
-	}
+    public TCPNetSyslogConfig() {
+        initialize();
+    }
 
-	public int getSoLingerSeconds() {
-		return this.soLingerSeconds;
-	}
+    protected void initialize() {
+        //
+    }
 
-	public void setSoLingerSeconds(int soLingerSeconds) {
-		this.soLingerSeconds = soLingerSeconds;
-	}
+    public TCPNetSyslogConfig(int facility, String host, int port) {
+        super(facility, host, port);
+        initialize();
+    }
 
-	public boolean isKeepAlive() {
-		return this.keepAlive;
-	}
+    public TCPNetSyslogConfig(int facility, String host) {
+        super(facility, host);
+        initialize();
+    }
 
-	public void setKeepAlive(boolean keepAlive) {
-		this.keepAlive = keepAlive;
-	}
+    public TCPNetSyslogConfig(int facility) {
+        super(facility);
+        initialize();
+    }
 
-	public boolean isReuseAddress() {
-		return this.reuseAddress;
-	}
+    public TCPNetSyslogConfig(String host, int port) {
+        super(host, port);
+        initialize();
+    }
 
-	public void setReuseAddress(boolean reuseAddress) {
-		this.reuseAddress = reuseAddress;
-	}
+    public TCPNetSyslogConfig(String host) {
+        super(host);
+        initialize();
+    }
 
-	public boolean isSetBufferSize() {
-		return this.setBufferSize;
-	}
+    public Class getSyslogClass() {
+        return TCPNetSyslog.class;
+    }
 
-	public void setSetBufferSize(boolean setBufferSize) {
-		this.setBufferSize = setBufferSize;
-	}
+    public byte[] getDelimiterSequence() {
+        return this.delimiterSequence;
+    }
 
-	public int getFreshConnectionInterval() {
-		return freshConnectionInterval;
-	}
+    public void setDelimiterSequence(byte[] delimiterSequence) {
+        this.delimiterSequence = delimiterSequence;
+    }
 
-	public void setFreshConnectionInterval(int freshConnectionInterval) {
-		this.freshConnectionInterval = freshConnectionInterval;
-	}
+    public void setDelimiterSequence(String delimiterSequence) {
+        this.delimiterSequence = SyslogUtility.getBytes(this, delimiterSequence);
+    }
 
-	public Class getSyslogWriterClass() {
-		return TCPNetSyslogWriter.class;
-	}
+    public boolean isPersistentConnection() {
+        return this.persistentConnection;
+    }
+
+    public void setPersistentConnection(boolean persistentConnection) {
+        this.persistentConnection = persistentConnection;
+    }
+
+    public boolean isSoLinger() {
+        return this.soLinger;
+    }
+
+    public void setSoLinger(boolean soLinger) {
+        this.soLinger = soLinger;
+    }
+
+    public int getSoLingerSeconds() {
+        return this.soLingerSeconds;
+    }
+
+    public void setSoLingerSeconds(int soLingerSeconds) {
+        this.soLingerSeconds = soLingerSeconds;
+    }
+
+    public boolean isKeepAlive() {
+        return this.keepAlive;
+    }
+
+    public void setKeepAlive(boolean keepAlive) {
+        this.keepAlive = keepAlive;
+    }
+
+    public boolean isReuseAddress() {
+        return this.reuseAddress;
+    }
+
+    public void setReuseAddress(boolean reuseAddress) {
+        this.reuseAddress = reuseAddress;
+    }
+
+    public boolean isSetBufferSize() {
+        return this.setBufferSize;
+    }
+
+    public void setSetBufferSize(boolean setBufferSize) {
+        this.setBufferSize = setBufferSize;
+    }
+
+    public int getFreshConnectionInterval() {
+        return freshConnectionInterval;
+    }
+
+    public void setFreshConnectionInterval(int freshConnectionInterval) {
+        this.freshConnectionInterval = freshConnectionInterval;
+    }
+
+    public Class getSyslogWriterClass() {
+        return TCPNetSyslogWriter.class;
+    }
 }

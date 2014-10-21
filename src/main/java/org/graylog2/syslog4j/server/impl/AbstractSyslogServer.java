@@ -22,318 +22,318 @@ import org.graylog2.syslog4j.server.impl.event.structured.StructuredSyslogServer
 import org.graylog2.syslog4j.util.SyslogUtility;
 
 /**
-* AbstractSyslogServer provides a base abstract implementation of the SyslogServerIF.
-* 
-* <p>Syslog4j is licensed under the Lesser GNU Public License v2.1.  A copy
-* of the LGPL license is available in the META-INF folder in all
-* distributions of Syslog4j and in the base directory of the "doc" ZIP.</p>
-* 
-* @author &lt;syslog4j@productivity.org&gt;
-* @version $Id: AbstractSyslogServer.java,v 1.12 2011/01/11 05:11:13 cvs Exp $
-*/
+ * AbstractSyslogServer provides a base abstract implementation of the SyslogServerIF.
+ * <p/>
+ * <p>Syslog4j is licensed under the Lesser GNU Public License v2.1.  A copy
+ * of the LGPL license is available in the META-INF folder in all
+ * distributions of Syslog4j and in the base directory of the "doc" ZIP.</p>
+ *
+ * @author &lt;syslog4j@productivity.org&gt;
+ * @version $Id: AbstractSyslogServer.java,v 1.12 2011/01/11 05:11:13 cvs Exp $
+ */
 public abstract class AbstractSyslogServer implements SyslogServerIF {
-	public static class Sessions extends HashMap {
-		private static final long serialVersionUID = -4438949276263772580L;
-		
-		public static final Object syncObject = new Object();
+    public static class Sessions extends HashMap {
+        private static final long serialVersionUID = -4438949276263772580L;
 
-		public void addSocket(Socket socket) {
-			synchronized(syncObject) {
-				put(socket,new HashMap());
-			}
-		}
-		
-		public Iterator getSockets() {
-			if (size() > 0) {
-				return keySet().iterator();
-				
-			} else {
-				return null;
-			}
-		}
+        public static final Object syncObject = new Object();
 
-		public void addSession(Socket socket, SyslogServerEventHandlerIF eventHandler, Object session) {
-			synchronized(syncObject) {
-				Map handlerMap = getHandlerMap(socket);
-				
-				if (handlerMap == null) {
-					handlerMap = new HashMap();
-				}
-				
-				handlerMap.put(eventHandler,session);
-			}
-		}
+        public void addSocket(Socket socket) {
+            synchronized (syncObject) {
+                put(socket, new HashMap());
+            }
+        }
 
-		public void removeSocket(Socket socket) {
-			synchronized(syncObject) {
-				Map handlerMap = getHandlerMap(socket);
-				
-				if (handlerMap != null) {
-					handlerMap.clear();
-				}
-			}
-		}
+        public Iterator getSockets() {
+            if (size() > 0) {
+                return keySet().iterator();
 
-		protected Map getHandlerMap(Socket socket) {
-			Map handlerMap = null;
-			
-			if (containsKey(socket)) {
-				handlerMap = (Map) get(socket);
-			}
-			
-			return handlerMap;
-		}
+            } else {
+                return null;
+            }
+        }
 
-		public Object getSession(Socket socket, SyslogServerEventHandlerIF eventHandler) {
-			synchronized(syncObject) {
-				Map handlerMap = getHandlerMap(socket);
-				
-				Object session = handlerMap.get(eventHandler);
-				
-				return session;
-			}
-		}
-	}
-	
-	protected String syslogProtocol = null;
-	protected AbstractSyslogServerConfig syslogServerConfig = null;
-	protected Thread thread = null;
-	
-	protected boolean shutdown = false;
-	
-	public void initialize(String protocol, SyslogServerConfigIF config) throws SyslogRuntimeException {
-		this.syslogProtocol = protocol;
-		
-		try {
-			this.syslogServerConfig = (AbstractSyslogServerConfig) config;
-			
-		} catch (ClassCastException cce) {
-			throw new SyslogRuntimeException(cce);
-		}
-		
-		initialize();
-	}
-	
-	public String getProtocol() {
-		return this.syslogProtocol;
-	}
+        public void addSession(Socket socket, SyslogServerEventHandlerIF eventHandler, Object session) {
+            synchronized (syncObject) {
+                Map handlerMap = getHandlerMap(socket);
 
-	public SyslogServerConfigIF getConfig() {
-		return this.syslogServerConfig;
-	}
-	
-	protected abstract void initialize() throws SyslogRuntimeException;
-	
-	public void shutdown() throws SyslogRuntimeException {
-		this.shutdown = true;
-	}
+                if (handlerMap == null) {
+                    handlerMap = new HashMap();
+                }
 
-	public Thread getThread() {
-		return this.thread;
-	}
+                handlerMap.put(eventHandler, session);
+            }
+        }
 
-	public void setThread(Thread thread) {
-		this.thread = thread;
-	}
-	
-	protected static boolean isStructuredMessage(SyslogCharSetIF syslogCharSet, byte[] receiveData) {
-		String receiveDataString = SyslogUtility.newString(syslogCharSet, receiveData);
+        public void removeSocket(Socket socket) {
+            synchronized (syncObject) {
+                Map handlerMap = getHandlerMap(socket);
 
-		boolean isStructuredMessage = isStructuredMessage(syslogCharSet,receiveDataString);
-		
-		return isStructuredMessage;
-	}
+                if (handlerMap != null) {
+                    handlerMap.clear();
+                }
+            }
+        }
 
-	protected static boolean isStructuredMessage(SyslogCharSetIF syslogCharSet, String receiveData) {
-		int idx = receiveData.indexOf('>');
+        protected Map getHandlerMap(Socket socket) {
+            Map handlerMap = null;
 
-		if (idx != -1) {
-			// If there's a numerical VERSION field after the <priority>, return true.
-			if (receiveData.length() > idx + 1 && Character.isDigit(receiveData.charAt(idx + 1))) {
-				return true;
-			}
-		}
+            if (containsKey(socket)) {
+                handlerMap = (Map) get(socket);
+            }
 
-		return false;
-	}
+            return handlerMap;
+        }
 
-	protected static SyslogServerEventIF createEvent(SyslogServerConfigIF serverConfig, byte[] lineBytes, int lineBytesLength, InetAddress inetAddr) {
-		SyslogServerEventIF event = null;
-		
-		if (serverConfig.isUseStructuredData() && AbstractSyslogServer.isStructuredMessage(serverConfig,lineBytes)) {
-			event = new StructuredSyslogServerEvent(lineBytes,lineBytesLength,inetAddr);
-			
-			if (serverConfig.getDateTimeFormatter() != null) {
-				((StructuredSyslogServerEvent) event).setDateTimeFormatter(serverConfig.getDateTimeFormatter());
-			}
-			
-		} else {
-			event = new SyslogServerEvent(lineBytes,lineBytesLength,inetAddr);
-		}		
-		
-		return event;
-	}
-	
-	protected static SyslogServerEventIF createEvent(SyslogServerConfigIF serverConfig, String line, InetAddress inetAddr) {
-		SyslogServerEventIF event = null;
-		
-		if (serverConfig.isUseStructuredData() && AbstractSyslogServer.isStructuredMessage(serverConfig,line)) {
-			event = new StructuredSyslogServerEvent(line,inetAddr);
-			
-		} else {
-			event = new SyslogServerEvent(line,inetAddr);
-		}		
-		
-		return event;
-	}
-	
-	public static void handleInitialize(SyslogServerIF syslogServer) {
-		List eventHandlers = syslogServer.getConfig().getEventHandlers();
-		
-		for(int i=0; i<eventHandlers.size(); i++) {
-			SyslogServerEventHandlerIF eventHandler = (SyslogServerEventHandlerIF) eventHandlers.get(i);
+        public Object getSession(Socket socket, SyslogServerEventHandlerIF eventHandler) {
+            synchronized (syncObject) {
+                Map handlerMap = getHandlerMap(socket);
 
-			try {
-				eventHandler.initialize(syslogServer);
-				
-			} catch (Exception exception) {
-				//
-			}
-		}
-	}
+                Object session = handlerMap.get(eventHandler);
 
-	public static void handleDestroy(SyslogServerIF syslogServer) {
-		List eventHandlers = syslogServer.getConfig().getEventHandlers();
-		
-		for(int i=0; i<eventHandlers.size(); i++) {
-			SyslogServerEventHandlerIF eventHandler = (SyslogServerEventHandlerIF) eventHandlers.get(i);
+                return session;
+            }
+        }
+    }
 
-			try {
-				eventHandler.destroy(syslogServer);
-					
-			} catch (Exception exception) {
-				//
-			}
-		}
-	}
+    protected String syslogProtocol = null;
+    protected AbstractSyslogServerConfig syslogServerConfig = null;
+    protected Thread thread = null;
 
-	public static void handleSessionOpen(Sessions sessions, SyslogServerIF syslogServer, Socket socket) {
-		List eventHandlers = syslogServer.getConfig().getEventHandlers();
-		
-		for(int i=0; i<eventHandlers.size(); i++) {
-			SyslogServerEventHandlerIF eventHandler = (SyslogServerEventHandlerIF) eventHandlers.get(i);
-			
-			if (eventHandler instanceof SyslogServerSessionEventHandlerIF) {
-				try {
-					Object session = ((SyslogServerSessionEventHandlerIF) eventHandler).sessionOpened(syslogServer,socket.getRemoteSocketAddress());
-					
-					if (session != null) {
-						sessions.addSession(socket,eventHandler,session);
-					}
-					
-				} catch (Exception exception) {
-					try {
-						((SyslogServerSessionEventHandlerIF) eventHandler).exception(null,syslogServer,socket.getRemoteSocketAddress(),exception);
-						
-					} catch (Exception e) {
-						//
-					}
-				}
-			}
-		}
-	}
+    protected boolean shutdown = false;
 
-	public static void handleSessionClosed(Sessions sessions, SyslogServerIF syslogServer, Socket socket, boolean timeout) {
-		List eventHandlers = syslogServer.getConfig().getEventHandlers();
-		
-		for(int i=0; i<eventHandlers.size(); i++) {
-			SyslogServerEventHandlerIF eventHandler = (SyslogServerEventHandlerIF) eventHandlers.get(i);
+    public void initialize(String protocol, SyslogServerConfigIF config) throws SyslogRuntimeException {
+        this.syslogProtocol = protocol;
 
-			if (eventHandler instanceof SyslogServerSessionEventHandlerIF) {
-				Object session = sessions.getSession(socket,eventHandler);
-				
-				try {
-					((SyslogServerSessionEventHandlerIF) eventHandler).sessionClosed(session,syslogServer,socket.getRemoteSocketAddress(),timeout);
-					
-				} catch (Exception exception) {
-					try {
-						((SyslogServerSessionEventHandlerIF) eventHandler).exception(session,syslogServer,socket.getRemoteSocketAddress(),exception);
-						
-					} catch (Exception e) {
-						//
-					}
-				}
-			}
-		}
-	}
+        try {
+            this.syslogServerConfig = (AbstractSyslogServerConfig) config;
 
-	public static void handleEvent(Sessions sessions, SyslogServerIF syslogServer, DatagramPacket packet, SyslogServerEventIF event) {
-		handleEvent(sessions,syslogServer,null,packet.getSocketAddress(),event);
-	}
+        } catch (ClassCastException cce) {
+            throw new SyslogRuntimeException(cce);
+        }
 
-	public static void handleEvent(Sessions sessions, SyslogServerIF syslogServer, Socket socket, SyslogServerEventIF event) {
-		handleEvent(sessions,syslogServer,socket,socket.getRemoteSocketAddress(),event);
-	}
+        initialize();
+    }
 
-	protected static void handleEvent(Sessions sessions, SyslogServerIF syslogServer, Socket socket, SocketAddress socketAddress, SyslogServerEventIF event) {
-		List eventHandlers = syslogServer.getConfig().getEventHandlers();
-		
-		for(int i=0; i<eventHandlers.size(); i++) {
-			SyslogServerEventHandlerIF eventHandler = (SyslogServerEventHandlerIF) eventHandlers.get(i);
-			
-			Object session = (sessions != null && socket != null) ? sessions.getSession(socket,eventHandler) : null;
-			
-			if (eventHandler instanceof SyslogServerSessionEventHandlerIF) {
-				try {
-					((SyslogServerSessionEventHandlerIF) eventHandler).event(session,syslogServer,socketAddress,event);
-					
-				} catch (Exception exception) {
-					try {
-						((SyslogServerSessionEventHandlerIF) eventHandler).exception(session,syslogServer,socketAddress,exception);
-					
-					} catch (Exception e) {
-						//
-					}
-				}
-				
-			} else if (eventHandler instanceof SyslogServerSessionlessEventHandlerIF) {
-				try {
-					((SyslogServerSessionlessEventHandlerIF) eventHandler).event(syslogServer,socketAddress,event);
-					
-				} catch (Exception exception) {
-					try {
-						((SyslogServerSessionlessEventHandlerIF) eventHandler).exception(syslogServer,socketAddress,exception);
-						
-					} catch (Exception e) {
-						//
-					}
-				}
-			}
-		}
-	}
+    public String getProtocol() {
+        return this.syslogProtocol;
+    }
 
-	public static void handleException(Object session, SyslogServerIF syslogServer, SocketAddress socketAddress, Exception exception) {
-		List eventHandlers = syslogServer.getConfig().getEventHandlers();
-		
-		for(int i=0; i<eventHandlers.size(); i++) {
-			SyslogServerEventHandlerIF eventHandler = (SyslogServerEventHandlerIF) eventHandlers.get(i);
+    public SyslogServerConfigIF getConfig() {
+        return this.syslogServerConfig;
+    }
 
-			if (eventHandler instanceof SyslogServerSessionEventHandlerIF) {
-				try {
-					((SyslogServerSessionEventHandlerIF) eventHandler).exception(session,syslogServer,socketAddress,exception);
-					
-				} catch (Exception e) {
-					//
-				}
-				
-			} else if (eventHandler instanceof SyslogServerSessionlessEventHandlerIF) {
-				try {
-					((SyslogServerSessionlessEventHandlerIF) eventHandler).exception(syslogServer,socketAddress,exception);
-					
-				} catch (Exception e) {
-					//					
-				}
-			}
-		}
-	}
+    protected abstract void initialize() throws SyslogRuntimeException;
+
+    public void shutdown() throws SyslogRuntimeException {
+        this.shutdown = true;
+    }
+
+    public Thread getThread() {
+        return this.thread;
+    }
+
+    public void setThread(Thread thread) {
+        this.thread = thread;
+    }
+
+    protected static boolean isStructuredMessage(SyslogCharSetIF syslogCharSet, byte[] receiveData) {
+        String receiveDataString = SyslogUtility.newString(syslogCharSet, receiveData);
+
+        boolean isStructuredMessage = isStructuredMessage(syslogCharSet, receiveDataString);
+
+        return isStructuredMessage;
+    }
+
+    protected static boolean isStructuredMessage(SyslogCharSetIF syslogCharSet, String receiveData) {
+        int idx = receiveData.indexOf('>');
+
+        if (idx != -1) {
+            // If there's a numerical VERSION field after the <priority>, return true.
+            if (receiveData.length() > idx + 1 && Character.isDigit(receiveData.charAt(idx + 1))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected static SyslogServerEventIF createEvent(SyslogServerConfigIF serverConfig, byte[] lineBytes, int lineBytesLength, InetAddress inetAddr) {
+        SyslogServerEventIF event = null;
+
+        if (serverConfig.isUseStructuredData() && AbstractSyslogServer.isStructuredMessage(serverConfig, lineBytes)) {
+            event = new StructuredSyslogServerEvent(lineBytes, lineBytesLength, inetAddr);
+
+            if (serverConfig.getDateTimeFormatter() != null) {
+                ((StructuredSyslogServerEvent) event).setDateTimeFormatter(serverConfig.getDateTimeFormatter());
+            }
+
+        } else {
+            event = new SyslogServerEvent(lineBytes, lineBytesLength, inetAddr);
+        }
+
+        return event;
+    }
+
+    protected static SyslogServerEventIF createEvent(SyslogServerConfigIF serverConfig, String line, InetAddress inetAddr) {
+        SyslogServerEventIF event = null;
+
+        if (serverConfig.isUseStructuredData() && AbstractSyslogServer.isStructuredMessage(serverConfig, line)) {
+            event = new StructuredSyslogServerEvent(line, inetAddr);
+
+        } else {
+            event = new SyslogServerEvent(line, inetAddr);
+        }
+
+        return event;
+    }
+
+    public static void handleInitialize(SyslogServerIF syslogServer) {
+        List eventHandlers = syslogServer.getConfig().getEventHandlers();
+
+        for (int i = 0; i < eventHandlers.size(); i++) {
+            SyslogServerEventHandlerIF eventHandler = (SyslogServerEventHandlerIF) eventHandlers.get(i);
+
+            try {
+                eventHandler.initialize(syslogServer);
+
+            } catch (Exception exception) {
+                //
+            }
+        }
+    }
+
+    public static void handleDestroy(SyslogServerIF syslogServer) {
+        List eventHandlers = syslogServer.getConfig().getEventHandlers();
+
+        for (int i = 0; i < eventHandlers.size(); i++) {
+            SyslogServerEventHandlerIF eventHandler = (SyslogServerEventHandlerIF) eventHandlers.get(i);
+
+            try {
+                eventHandler.destroy(syslogServer);
+
+            } catch (Exception exception) {
+                //
+            }
+        }
+    }
+
+    public static void handleSessionOpen(Sessions sessions, SyslogServerIF syslogServer, Socket socket) {
+        List eventHandlers = syslogServer.getConfig().getEventHandlers();
+
+        for (int i = 0; i < eventHandlers.size(); i++) {
+            SyslogServerEventHandlerIF eventHandler = (SyslogServerEventHandlerIF) eventHandlers.get(i);
+
+            if (eventHandler instanceof SyslogServerSessionEventHandlerIF) {
+                try {
+                    Object session = ((SyslogServerSessionEventHandlerIF) eventHandler).sessionOpened(syslogServer, socket.getRemoteSocketAddress());
+
+                    if (session != null) {
+                        sessions.addSession(socket, eventHandler, session);
+                    }
+
+                } catch (Exception exception) {
+                    try {
+                        ((SyslogServerSessionEventHandlerIF) eventHandler).exception(null, syslogServer, socket.getRemoteSocketAddress(), exception);
+
+                    } catch (Exception e) {
+                        //
+                    }
+                }
+            }
+        }
+    }
+
+    public static void handleSessionClosed(Sessions sessions, SyslogServerIF syslogServer, Socket socket, boolean timeout) {
+        List eventHandlers = syslogServer.getConfig().getEventHandlers();
+
+        for (int i = 0; i < eventHandlers.size(); i++) {
+            SyslogServerEventHandlerIF eventHandler = (SyslogServerEventHandlerIF) eventHandlers.get(i);
+
+            if (eventHandler instanceof SyslogServerSessionEventHandlerIF) {
+                Object session = sessions.getSession(socket, eventHandler);
+
+                try {
+                    ((SyslogServerSessionEventHandlerIF) eventHandler).sessionClosed(session, syslogServer, socket.getRemoteSocketAddress(), timeout);
+
+                } catch (Exception exception) {
+                    try {
+                        ((SyslogServerSessionEventHandlerIF) eventHandler).exception(session, syslogServer, socket.getRemoteSocketAddress(), exception);
+
+                    } catch (Exception e) {
+                        //
+                    }
+                }
+            }
+        }
+    }
+
+    public static void handleEvent(Sessions sessions, SyslogServerIF syslogServer, DatagramPacket packet, SyslogServerEventIF event) {
+        handleEvent(sessions, syslogServer, null, packet.getSocketAddress(), event);
+    }
+
+    public static void handleEvent(Sessions sessions, SyslogServerIF syslogServer, Socket socket, SyslogServerEventIF event) {
+        handleEvent(sessions, syslogServer, socket, socket.getRemoteSocketAddress(), event);
+    }
+
+    protected static void handleEvent(Sessions sessions, SyslogServerIF syslogServer, Socket socket, SocketAddress socketAddress, SyslogServerEventIF event) {
+        List eventHandlers = syslogServer.getConfig().getEventHandlers();
+
+        for (int i = 0; i < eventHandlers.size(); i++) {
+            SyslogServerEventHandlerIF eventHandler = (SyslogServerEventHandlerIF) eventHandlers.get(i);
+
+            Object session = (sessions != null && socket != null) ? sessions.getSession(socket, eventHandler) : null;
+
+            if (eventHandler instanceof SyslogServerSessionEventHandlerIF) {
+                try {
+                    ((SyslogServerSessionEventHandlerIF) eventHandler).event(session, syslogServer, socketAddress, event);
+
+                } catch (Exception exception) {
+                    try {
+                        ((SyslogServerSessionEventHandlerIF) eventHandler).exception(session, syslogServer, socketAddress, exception);
+
+                    } catch (Exception e) {
+                        //
+                    }
+                }
+
+            } else if (eventHandler instanceof SyslogServerSessionlessEventHandlerIF) {
+                try {
+                    ((SyslogServerSessionlessEventHandlerIF) eventHandler).event(syslogServer, socketAddress, event);
+
+                } catch (Exception exception) {
+                    try {
+                        ((SyslogServerSessionlessEventHandlerIF) eventHandler).exception(syslogServer, socketAddress, exception);
+
+                    } catch (Exception e) {
+                        //
+                    }
+                }
+            }
+        }
+    }
+
+    public static void handleException(Object session, SyslogServerIF syslogServer, SocketAddress socketAddress, Exception exception) {
+        List eventHandlers = syslogServer.getConfig().getEventHandlers();
+
+        for (int i = 0; i < eventHandlers.size(); i++) {
+            SyslogServerEventHandlerIF eventHandler = (SyslogServerEventHandlerIF) eventHandlers.get(i);
+
+            if (eventHandler instanceof SyslogServerSessionEventHandlerIF) {
+                try {
+                    ((SyslogServerSessionEventHandlerIF) eventHandler).exception(session, syslogServer, socketAddress, exception);
+
+                } catch (Exception e) {
+                    //
+                }
+
+            } else if (eventHandler instanceof SyslogServerSessionlessEventHandlerIF) {
+                try {
+                    ((SyslogServerSessionlessEventHandlerIF) eventHandler).exception(syslogServer, socketAddress, exception);
+
+                } catch (Exception e) {
+                    //
+                }
+            }
+        }
+    }
 }

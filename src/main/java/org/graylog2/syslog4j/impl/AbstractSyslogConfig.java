@@ -10,369 +10,369 @@ import org.graylog2.syslog4j.impl.backlog.printstream.SystemErrSyslogBackLogHand
 import org.graylog2.syslog4j.util.SyslogUtility;
 
 /**
-* AbstractSyslog provides a base abstract implementation of the SyslogConfigIF
-* configuration interface.
-* 
-* <p>Syslog4j is licensed under the Lesser GNU Public License v2.1.  A copy
-* of the LGPL license is available in the META-INF folder in all
-* distributions of Syslog4j and in the base directory of the "doc" ZIP.</p>
-* 
-* @author &lt;syslog4j@productivity.org&gt;
-* @version $Id: AbstractSyslogConfig.java,v 1.24 2010/11/28 04:43:31 cvs Exp $
-*/
+ * AbstractSyslog provides a base abstract implementation of the SyslogConfigIF
+ * configuration interface.
+ * <p/>
+ * <p>Syslog4j is licensed under the Lesser GNU Public License v2.1.  A copy
+ * of the LGPL license is available in the META-INF folder in all
+ * distributions of Syslog4j and in the base directory of the "doc" ZIP.</p>
+ *
+ * @author &lt;syslog4j@productivity.org&gt;
+ * @version $Id: AbstractSyslogConfig.java,v 1.24 2010/11/28 04:43:31 cvs Exp $
+ */
 public abstract class AbstractSyslogConfig implements AbstractSyslogConfigIF {
-	private static final long serialVersionUID = -3728308557871358111L;
-	
-	protected final static List defaultBackLogHandlers = new ArrayList();
-	
-	static {
-		defaultBackLogHandlers.add(new SystemErrSyslogBackLogHandler());
-	}
-	
-	protected int facility = SYSLOG_FACILITY_DEFAULT;
-	
-	protected String charSet = CHAR_SET_DEFAULT;
-	
-	protected String ident = "";
+    private static final long serialVersionUID = -3728308557871358111L;
 
-	protected String localName = null;
+    protected final static List defaultBackLogHandlers = new ArrayList();
 
-	protected boolean sendLocalTimestamp = SEND_LOCAL_TIMESTAMP_DEFAULT;
-	protected boolean sendLocalName = SEND_LOCAL_NAME_DEFAULT;
-	
-	protected boolean includeIdentInMessageModifier = INCLUDE_IDENT_IN_MESSAGE_MODIFIER_DEFAULT;
-	protected boolean throwExceptionOnWrite = THROW_EXCEPTION_ON_WRITE_DEFAULT;
-	protected boolean throwExceptionOnInitialize = THROW_EXCEPTION_ON_INITIALIZE_DEFAULT;
-	
-	protected int maxMessageLength = MAX_MESSAGE_LENGTH_DEFAULT;
-	protected byte[] splitMessageBeginText = SPLIT_MESSAGE_BEGIN_TEXT_DEFAULT.getBytes();
-	protected byte[] splitMessageEndText = SPLIT_MESSAGE_END_TEXT_DEFAULT.getBytes();
-	
-	protected List messageModifiers = null;
-	protected List backLogHandlers = null;
+    static {
+        defaultBackLogHandlers.add(new SystemErrSyslogBackLogHandler());
+    }
 
-	protected boolean threaded = THREADED_DEFAULT;
-	protected boolean useDaemonThread = USE_DAEMON_THREAD_DEFAULT;
-	protected int threadPriority = THREAD_PRIORITY_DEFAULT;
-	protected long threadLoopInterval = THREAD_LOOP_INTERVAL_DEFAULT;
-	
-	protected int writeRetries = WRITE_RETRIES_DEFAULT;
-	protected long maxShutdownWait = MAX_SHUTDOWN_WAIT_DEFAULT;
-	
-	protected boolean truncateMessage = TRUNCATE_MESSAGE_DEFAULT;
-	protected boolean useStructuredData = USE_STRUCTURED_DATA_DEFAULT;
+    protected int facility = SYSLOG_FACILITY_DEFAULT;
 
-	public abstract Class getSyslogClass();
-	
-	public String getCharSet() {
-		return this.charSet;
-	}
+    protected String charSet = CHAR_SET_DEFAULT;
 
-	public void setCharSet(String charSet) {
-		this.charSet = charSet;
-	}
+    protected String ident = "";
 
-	public String getLocalName() {
-		return localName;
-	}
+    protected String localName = null;
 
-	public void setLocalName(String localName) {
-		this.localName = localName;
-	}
+    protected boolean sendLocalTimestamp = SEND_LOCAL_TIMESTAMP_DEFAULT;
+    protected boolean sendLocalName = SEND_LOCAL_NAME_DEFAULT;
 
-	public boolean isThrowExceptionOnWrite() {
-		return this.throwExceptionOnWrite;
-	}
+    protected boolean includeIdentInMessageModifier = INCLUDE_IDENT_IN_MESSAGE_MODIFIER_DEFAULT;
+    protected boolean throwExceptionOnWrite = THROW_EXCEPTION_ON_WRITE_DEFAULT;
+    protected boolean throwExceptionOnInitialize = THROW_EXCEPTION_ON_INITIALIZE_DEFAULT;
 
-	public void setThrowExceptionOnWrite(boolean throwExceptionOnWrite) {
-		this.throwExceptionOnWrite = throwExceptionOnWrite;
-	}
+    protected int maxMessageLength = MAX_MESSAGE_LENGTH_DEFAULT;
+    protected byte[] splitMessageBeginText = SPLIT_MESSAGE_BEGIN_TEXT_DEFAULT.getBytes();
+    protected byte[] splitMessageEndText = SPLIT_MESSAGE_END_TEXT_DEFAULT.getBytes();
 
-	public boolean isThrowExceptionOnInitialize() {
-		return this.throwExceptionOnInitialize;
-	}
+    protected List messageModifiers = null;
+    protected List backLogHandlers = null;
 
-	public void setThrowExceptionOnInitialize(boolean throwExceptionOnInitialize) {
-		this.throwExceptionOnInitialize = throwExceptionOnInitialize;
-	}
+    protected boolean threaded = THREADED_DEFAULT;
+    protected boolean useDaemonThread = USE_DAEMON_THREAD_DEFAULT;
+    protected int threadPriority = THREAD_PRIORITY_DEFAULT;
+    protected long threadLoopInterval = THREAD_LOOP_INTERVAL_DEFAULT;
 
-	public byte[] getSplitMessageBeginText() {
-		return this.splitMessageBeginText;
-	}
+    protected int writeRetries = WRITE_RETRIES_DEFAULT;
+    protected long maxShutdownWait = MAX_SHUTDOWN_WAIT_DEFAULT;
 
-	public void setSplitMessageBeginText(byte[] splitMessageBeginText) {
-		this.splitMessageBeginText = splitMessageBeginText;
-	}
+    protected boolean truncateMessage = TRUNCATE_MESSAGE_DEFAULT;
+    protected boolean useStructuredData = USE_STRUCTURED_DATA_DEFAULT;
 
-	public void setSplitMessageBeginText(String splitMessageBeginText) throws SyslogRuntimeException {
-		this.splitMessageBeginText = SyslogUtility.getBytes(this,splitMessageBeginText);
-	}
+    public abstract Class getSyslogClass();
 
-	public byte[] getSplitMessageEndText() {
-		return this.splitMessageEndText;
-	}
+    public String getCharSet() {
+        return this.charSet;
+    }
 
-	public void setSplitMessageEndText(byte[] splitMessageEndText) {
-		this.splitMessageEndText = splitMessageEndText;
-	}
+    public void setCharSet(String charSet) {
+        this.charSet = charSet;
+    }
 
-	public void setSplitMessageEndText(String splitMessageEndText) throws SyslogRuntimeException {
-		this.splitMessageEndText = SyslogUtility.getBytes(this,splitMessageEndText);
-	}
+    public String getLocalName() {
+        return localName;
+    }
 
-	public int getMaxMessageLength() {
-		return this.maxMessageLength;
-	}
+    public void setLocalName(String localName) {
+        this.localName = localName;
+    }
 
-	public void setMaxMessageLength(int maxMessageLength) {
-		this.maxMessageLength = maxMessageLength;
-	}
+    public boolean isThrowExceptionOnWrite() {
+        return this.throwExceptionOnWrite;
+    }
 
-	public boolean isSendLocalTimestamp() {
-		return this.sendLocalTimestamp;
-	}
+    public void setThrowExceptionOnWrite(boolean throwExceptionOnWrite) {
+        this.throwExceptionOnWrite = throwExceptionOnWrite;
+    }
 
-	public void setSendLocalTimestamp(boolean sendLocalTimestamp) {
-		this.sendLocalTimestamp = sendLocalTimestamp;
-	}
+    public boolean isThrowExceptionOnInitialize() {
+        return this.throwExceptionOnInitialize;
+    }
 
-	public boolean isSendLocalName() {
-		return this.sendLocalName;
-	}
+    public void setThrowExceptionOnInitialize(boolean throwExceptionOnInitialize) {
+        this.throwExceptionOnInitialize = throwExceptionOnInitialize;
+    }
 
-	public void setSendLocalName(boolean sendLocalName) {
-		this.sendLocalName = sendLocalName;
-	}
-	
-	public int getFacility() {
-		return this.facility;
-	}
+    public byte[] getSplitMessageBeginText() {
+        return this.splitMessageBeginText;
+    }
 
-	public void setFacility(int facility) {
-		this.facility = facility;
-	}
+    public void setSplitMessageBeginText(byte[] splitMessageBeginText) {
+        this.splitMessageBeginText = splitMessageBeginText;
+    }
 
-	public void setFacility(String facilityName) {
-		this.facility = SyslogUtility.getFacility(facilityName);
-	}
-	
-	public String getIdent() {
-		return this.ident;
-	}
-	
-	public void setIdent(String ident) {
-		this.ident = ident;
-	}
+    public void setSplitMessageBeginText(String splitMessageBeginText) throws SyslogRuntimeException {
+        this.splitMessageBeginText = SyslogUtility.getBytes(this, splitMessageBeginText);
+    }
 
-	protected synchronized List _getMessageModifiers() {
-		if (this.messageModifiers == null) {
-			this.messageModifiers = new ArrayList();
-		}
-		
-		return this.messageModifiers;
-	}
-	
-	public void addMessageModifier(SyslogMessageModifierIF messageModifier) {
-		if (messageModifier == null) {
-			return;
-		}
-		
-		List _messageModifiers = _getMessageModifiers();
-		
-		synchronized(_messageModifiers) {
-			_messageModifiers.add(messageModifier);
-		}
-	}
+    public byte[] getSplitMessageEndText() {
+        return this.splitMessageEndText;
+    }
 
-	public void insertMessageModifier(int index, SyslogMessageModifierIF messageModifier) {
-		if (messageModifier == null) {
-			return;
-		}
-		
-		List _messageModifiers = _getMessageModifiers();
-		
-		synchronized(_messageModifiers) {
-			try {
-				_messageModifiers.add(index,messageModifier);
-				
-			} catch (IndexOutOfBoundsException ioobe) {
-				throw new SyslogRuntimeException(ioobe);
-			}
-		}
-	}
+    public void setSplitMessageEndText(byte[] splitMessageEndText) {
+        this.splitMessageEndText = splitMessageEndText;
+    }
 
-	public void removeMessageModifier(SyslogMessageModifierIF messageModifier) {
-		if (messageModifier == null) {
-			return;
-		}
-		
-		List _messageModifiers = _getMessageModifiers();
-		
-		synchronized(_messageModifiers) {
-			_messageModifiers.remove(messageModifier);
-		}
-	}
+    public void setSplitMessageEndText(String splitMessageEndText) throws SyslogRuntimeException {
+        this.splitMessageEndText = SyslogUtility.getBytes(this, splitMessageEndText);
+    }
 
-	public List getMessageModifiers() {
-		return this.messageModifiers;
-	}
+    public int getMaxMessageLength() {
+        return this.maxMessageLength;
+    }
 
-	public void setMessageModifiers(List messageModifiers) {
-		this.messageModifiers = messageModifiers;
-	}	
-	
-	public void removeAllMessageModifiers() {
-		if (this.messageModifiers == null || this.messageModifiers.isEmpty()) {
-			return;
-		}
-		
-		this.messageModifiers.clear();
-	}
+    public void setMaxMessageLength(int maxMessageLength) {
+        this.maxMessageLength = maxMessageLength;
+    }
 
-	protected synchronized List _getBackLogHandlers() {
-		if (this.backLogHandlers == null) {
-			this.backLogHandlers = new ArrayList();
-		}
-		
-		return this.backLogHandlers;
-	}
-	
-	public void addBackLogHandler(SyslogBackLogHandlerIF backLogHandler) {
-		if (backLogHandler == null) {
-			return;
-		}
-		
-		List _backLogHandlers = _getBackLogHandlers();
-		
-		synchronized(_backLogHandlers) {
-			backLogHandler.initialize();
-			_backLogHandlers.add(backLogHandler);
-		}
-	}
+    public boolean isSendLocalTimestamp() {
+        return this.sendLocalTimestamp;
+    }
 
-	public void insertBackLogHandler(int index, SyslogBackLogHandlerIF backLogHandler) {
-		if (backLogHandler == null) {
-			return;
-		}
-		
-		List _backLogHandlers = _getBackLogHandlers();
-		
-		synchronized(_backLogHandlers) {
-			try {
-				backLogHandler.initialize();
-				_backLogHandlers.add(index,backLogHandler);
-				
-			} catch (IndexOutOfBoundsException ioobe) {
-				throw new SyslogRuntimeException(ioobe);
-			}
-		}
-	}
+    public void setSendLocalTimestamp(boolean sendLocalTimestamp) {
+        this.sendLocalTimestamp = sendLocalTimestamp;
+    }
 
-	public void removeBackLogHandler(SyslogBackLogHandlerIF backLogHandler) {
-		if (backLogHandler == null) {
-			return;
-		}
-		
-		List _backLogHandlers = _getBackLogHandlers();
-		
-		synchronized(_backLogHandlers) {
-			_backLogHandlers.remove(backLogHandler);
-		}
-	}
+    public boolean isSendLocalName() {
+        return this.sendLocalName;
+    }
 
-	public List getBackLogHandlers() {
-		if (this.backLogHandlers == null || this.backLogHandlers.size() < 1) {
-			return defaultBackLogHandlers;
-		}
-		
-		return this.backLogHandlers;
-	}
+    public void setSendLocalName(boolean sendLocalName) {
+        this.sendLocalName = sendLocalName;
+    }
 
-	public void setBackLogHandlers(List backLogHandlers) {
-		this.backLogHandlers = backLogHandlers;
-	}	
-	
-	public void removeAllBackLogHandlers() {
-		if (this.backLogHandlers == null || this.backLogHandlers.isEmpty()) {
-			return;
-		}
-		
-		this.backLogHandlers.clear();
-	}
+    public int getFacility() {
+        return this.facility;
+    }
 
-	public boolean isIncludeIdentInMessageModifier() {
-		return this.includeIdentInMessageModifier;
-	}
+    public void setFacility(int facility) {
+        this.facility = facility;
+    }
 
-	public void setIncludeIdentInMessageModifier(boolean includeIdentInMessageModifier) {
-		this.includeIdentInMessageModifier = includeIdentInMessageModifier;
-	}
+    public void setFacility(String facilityName) {
+        this.facility = SyslogUtility.getFacility(facilityName);
+    }
 
-	public boolean isThreaded() {
-		return this.threaded;
-	}
+    public String getIdent() {
+        return this.ident;
+    }
 
-	public void setThreaded(boolean threaded) {
-		this.threaded = threaded;
-	}
+    public void setIdent(String ident) {
+        this.ident = ident;
+    }
 
-	public boolean isUseDaemonThread() {
-		return useDaemonThread;
-	}
+    protected synchronized List _getMessageModifiers() {
+        if (this.messageModifiers == null) {
+            this.messageModifiers = new ArrayList();
+        }
 
-	public void setUseDaemonThread(boolean useDaemonThread) {
-		this.useDaemonThread = useDaemonThread;
-	}
+        return this.messageModifiers;
+    }
 
-	public int getThreadPriority() {
-		return threadPriority;
-	}
+    public void addMessageModifier(SyslogMessageModifierIF messageModifier) {
+        if (messageModifier == null) {
+            return;
+        }
 
-	public void setThreadPriority(int threadPriority) {
-		this.threadPriority = threadPriority;
-	}
+        List _messageModifiers = _getMessageModifiers();
 
-	public long getThreadLoopInterval() {
-		return this.threadLoopInterval;
-	}
+        synchronized (_messageModifiers) {
+            _messageModifiers.add(messageModifier);
+        }
+    }
 
-	public void setThreadLoopInterval(long threadLoopInterval) {
-		this.threadLoopInterval = threadLoopInterval;
-	}
-	
-	public long getMaxShutdownWait() {
-		return this.maxShutdownWait;
-	}
+    public void insertMessageModifier(int index, SyslogMessageModifierIF messageModifier) {
+        if (messageModifier == null) {
+            return;
+        }
 
-	public void setMaxShutdownWait(long maxShutdownWait) {
-		this.maxShutdownWait = maxShutdownWait;
-	}
+        List _messageModifiers = _getMessageModifiers();
 
-	public int getWriteRetries() {
-		return this.writeRetries;
-	}
+        synchronized (_messageModifiers) {
+            try {
+                _messageModifiers.add(index, messageModifier);
 
-	public void setWriteRetries(int writeRetries) {
-		this.writeRetries = writeRetries;
-	}
+            } catch (IndexOutOfBoundsException ioobe) {
+                throw new SyslogRuntimeException(ioobe);
+            }
+        }
+    }
 
-	public boolean isTruncateMessage() {
-		return this.truncateMessage;
-	}
+    public void removeMessageModifier(SyslogMessageModifierIF messageModifier) {
+        if (messageModifier == null) {
+            return;
+        }
 
-	public void setTruncateMessage(boolean truncateMessage) {
-		this.truncateMessage = truncateMessage;
-	}
+        List _messageModifiers = _getMessageModifiers();
 
-	public boolean isUseStructuredData() {
-		return this.useStructuredData;
-	}
+        synchronized (_messageModifiers) {
+            _messageModifiers.remove(messageModifier);
+        }
+    }
 
-	public void setUseStructuredData(boolean useStructuredData) {
-		this.useStructuredData = useStructuredData;
-	}
+    public List getMessageModifiers() {
+        return this.messageModifiers;
+    }
 
-	public Class getSyslogWriterClass() {
-		return null;
-	}
+    public void setMessageModifiers(List messageModifiers) {
+        this.messageModifiers = messageModifiers;
+    }
+
+    public void removeAllMessageModifiers() {
+        if (this.messageModifiers == null || this.messageModifiers.isEmpty()) {
+            return;
+        }
+
+        this.messageModifiers.clear();
+    }
+
+    protected synchronized List _getBackLogHandlers() {
+        if (this.backLogHandlers == null) {
+            this.backLogHandlers = new ArrayList();
+        }
+
+        return this.backLogHandlers;
+    }
+
+    public void addBackLogHandler(SyslogBackLogHandlerIF backLogHandler) {
+        if (backLogHandler == null) {
+            return;
+        }
+
+        List _backLogHandlers = _getBackLogHandlers();
+
+        synchronized (_backLogHandlers) {
+            backLogHandler.initialize();
+            _backLogHandlers.add(backLogHandler);
+        }
+    }
+
+    public void insertBackLogHandler(int index, SyslogBackLogHandlerIF backLogHandler) {
+        if (backLogHandler == null) {
+            return;
+        }
+
+        List _backLogHandlers = _getBackLogHandlers();
+
+        synchronized (_backLogHandlers) {
+            try {
+                backLogHandler.initialize();
+                _backLogHandlers.add(index, backLogHandler);
+
+            } catch (IndexOutOfBoundsException ioobe) {
+                throw new SyslogRuntimeException(ioobe);
+            }
+        }
+    }
+
+    public void removeBackLogHandler(SyslogBackLogHandlerIF backLogHandler) {
+        if (backLogHandler == null) {
+            return;
+        }
+
+        List _backLogHandlers = _getBackLogHandlers();
+
+        synchronized (_backLogHandlers) {
+            _backLogHandlers.remove(backLogHandler);
+        }
+    }
+
+    public List getBackLogHandlers() {
+        if (this.backLogHandlers == null || this.backLogHandlers.size() < 1) {
+            return defaultBackLogHandlers;
+        }
+
+        return this.backLogHandlers;
+    }
+
+    public void setBackLogHandlers(List backLogHandlers) {
+        this.backLogHandlers = backLogHandlers;
+    }
+
+    public void removeAllBackLogHandlers() {
+        if (this.backLogHandlers == null || this.backLogHandlers.isEmpty()) {
+            return;
+        }
+
+        this.backLogHandlers.clear();
+    }
+
+    public boolean isIncludeIdentInMessageModifier() {
+        return this.includeIdentInMessageModifier;
+    }
+
+    public void setIncludeIdentInMessageModifier(boolean includeIdentInMessageModifier) {
+        this.includeIdentInMessageModifier = includeIdentInMessageModifier;
+    }
+
+    public boolean isThreaded() {
+        return this.threaded;
+    }
+
+    public void setThreaded(boolean threaded) {
+        this.threaded = threaded;
+    }
+
+    public boolean isUseDaemonThread() {
+        return useDaemonThread;
+    }
+
+    public void setUseDaemonThread(boolean useDaemonThread) {
+        this.useDaemonThread = useDaemonThread;
+    }
+
+    public int getThreadPriority() {
+        return threadPriority;
+    }
+
+    public void setThreadPriority(int threadPriority) {
+        this.threadPriority = threadPriority;
+    }
+
+    public long getThreadLoopInterval() {
+        return this.threadLoopInterval;
+    }
+
+    public void setThreadLoopInterval(long threadLoopInterval) {
+        this.threadLoopInterval = threadLoopInterval;
+    }
+
+    public long getMaxShutdownWait() {
+        return this.maxShutdownWait;
+    }
+
+    public void setMaxShutdownWait(long maxShutdownWait) {
+        this.maxShutdownWait = maxShutdownWait;
+    }
+
+    public int getWriteRetries() {
+        return this.writeRetries;
+    }
+
+    public void setWriteRetries(int writeRetries) {
+        this.writeRetries = writeRetries;
+    }
+
+    public boolean isTruncateMessage() {
+        return this.truncateMessage;
+    }
+
+    public void setTruncateMessage(boolean truncateMessage) {
+        this.truncateMessage = truncateMessage;
+    }
+
+    public boolean isUseStructuredData() {
+        return this.useStructuredData;
+    }
+
+    public void setUseStructuredData(boolean useStructuredData) {
+        this.useStructuredData = useStructuredData;
+    }
+
+    public Class getSyslogWriterClass() {
+        return null;
+    }
 }

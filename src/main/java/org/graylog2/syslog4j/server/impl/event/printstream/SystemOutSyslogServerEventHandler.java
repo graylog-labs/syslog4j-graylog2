@@ -3,13 +3,13 @@ package org.graylog2.syslog4j.server.impl.event.printstream;
 import org.graylog2.syslog4j.server.SyslogServerSessionEventHandlerIF;
 
 public class SystemOutSyslogServerEventHandler extends PrintStreamSyslogServerEventHandler {
-	private static final long serialVersionUID = 1690551409588182601L;
+    private static final long serialVersionUID = 1690551409588182601L;
 
-	public static SyslogServerSessionEventHandlerIF create() {
-		return new SystemOutSyslogServerEventHandler();
-	}
-	
-	public SystemOutSyslogServerEventHandler() {
-		super(System.out);
-	}
+    public static SyslogServerSessionEventHandlerIF create() {
+        return new SystemOutSyslogServerEventHandler();
+    }
+
+    public SystemOutSyslogServerEventHandler() {
+        super(System.out);
+    }
 }
