@@ -1,7 +1,6 @@
 package org.graylog2.syslog4j.server.impl.event.structured;
 
 import org.joda.time.DateTime;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.net.InetAddress;
@@ -16,10 +15,6 @@ public class StructuredSyslogServerEventTest {
 
     private StructuredSyslogServerEvent buildEvent(String message) {
         return new StructuredSyslogServerEvent(message, INET_ADDR);
-    }
-
-    @BeforeMethod
-    public void setUp() throws Exception {
     }
 
     @Test
