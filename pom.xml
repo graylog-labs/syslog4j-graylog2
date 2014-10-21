@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
-        <version>7</version>
+        <version>9</version>
     </parent>
 
     <groupId>org.graylog2</groupId>
@@ -14,7 +14,12 @@
     <packaging>jar</packaging>
 
     <name>syslog4j-graylog2</name>
-    <url>http://maven.apache.org</url>
+    <url>https://github.com/Graylog2/syslog4j-graylog2</url>
+
+    <description>
+        Syslog4j provides client and server implementations of the BSD Syslog protocol (RFC 3164) and the draft "structured syslog" protocol (RFC Draft).
+        This is a repackaged fork used in Graylog2, as the original package has no recent versions published to Maven Central.
+    </description>
 
     <licenses>
         <license>
@@ -23,17 +28,23 @@
         </license>
     </licenses>
 
-    <description>Syslog4j provides client and server implementations of the BSD Syslog protocol (RFC 3164) and the draft "structured syslog" protocol (RFC Draft).
-        This is a repackaged fork used in Graylog2, as the original package has no recent versions published to Maven Central.
-    </description>
-
     <scm>
         <url>https://github.com/Graylog2/syslog4j-graylog2</url>
         <connection>scm:git:git@github.com:Graylog2/syslog4j-graylog2.git</connection>
         <developerConnection>scm:git:git@github.com:Graylog2/syslog4j-graylog2.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
-    
+
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/Graylog2/syslog4j-graylog2/issues</url>
+    </issueManagement>
+
+    <ciManagement>
+        <system>Travis CI</system>
+        <url>https://travis-ci.org/Graylog2/syslog4j-graylog2</url>
+    </ciManagement>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -92,6 +103,80 @@
                     <tagNameFormat>v@{project.version}</tagNameFormat>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.3</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.4</version>
+                <configuration>
+                    <skipDeploy>true</skipDeploy>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.github.github</groupId>
+                <artifactId>site-maven-plugin</artifactId>
+                <version>0.9</version>
+                <configuration>
+                    <path>${project.version}</path>
+                    <message>Maven site for ${project.name} ${project.version}</message>
+                    <merge>true</merge>
+                    <noJekyll>true</noJekyll>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>site</goal>
+                        </goals>
+                        <phase>site-deploy</phase>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>java8-disable-strict-javadoc</id>
+            <activation>
+                <jdk>[1.8,)</jdk>
+            </activation>
+            <properties>
+                <additionalparam>-Xdoclint:none</additionalparam>
+            </properties>
+        </profile>
+    </profiles>
 </project>
