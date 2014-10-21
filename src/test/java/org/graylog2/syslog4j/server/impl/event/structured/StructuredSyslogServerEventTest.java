@@ -55,6 +55,26 @@ public class StructuredSyslogServerEventTest {
     }
 
     @Test
+    public void testStructuredWithoutStructuredData() throws Exception {
+        // Message from: https://tools.ietf.org/html/rfc5424#section-6.5
+        final String message = "<165>1 2003-08-24T05:14:15.000003-07:00 192.0.2.1 myproc 8710 - - %% It's time to make the do-nuts.";
+
+        final StructuredSyslogServerEvent event = buildEvent(message);
+
+        assertEquals(event.getApplicationName(), "myproc");
+        assertEquals(event.getDateTime(), new DateTime("2003-08-24T05:14:15.000003-07:00"));
+        assertEquals(event.getFacility(), 20);
+        assertEquals(event.getHost(), "192.0.2.1");
+        assertEquals(event.getLevel(), 5);
+        assertEquals(event.getMessage(), "- - %% It's time to make the do-nuts.");
+        assertEquals(event.getProcessId(), "8710");
+
+        assertEquals(event.getStructuredMessage().getStructuredData(), null);
+        assertEquals(event.getStructuredMessage().getMessageId(), null);
+        assertEquals(event.getStructuredMessage().getMessage(), "- - %% It's time to make the do-nuts.");
+    }
+
+    @Test
     public void testStructuredSyslogNg1() throws Exception {
         // Message from: syslog-ng-core 3.5.3-1 package in Ubuntu 14.04 (default config)
         // Manually added ".000" to timestamp!
