@@ -1,11 +1,12 @@
 package org.graylog2.syslog4j.impl.message;
 
+import org.graylog2.syslog4j.SyslogMessageIF;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import org.graylog2.syslog4j.SyslogMessageIF;
+import java.util.Locale;
 
 /**
  * AbstractSyslogMessage provides support for turning POJO (Plain Ol'
@@ -50,13 +51,13 @@ public abstract class AbstractSyslogMessage implements SyslogMessageIF {
     }
 
     protected String generateDate() {
-        String date = new SimpleDateFormat(getDateFormat()).format(new Date());
+        String date = new SimpleDateFormat(getDateFormat(), Locale.ENGLISH).format(new Date());
 
         return date;
     }
 
     protected String generateTime() {
-        String time = new SimpleDateFormat(getTimeFormat()).format(new Date());
+        String time = new SimpleDateFormat(getTimeFormat(), Locale.ENGLISH).format(new Date());
 
         return time;
     }
@@ -64,8 +65,8 @@ public abstract class AbstractSyslogMessage implements SyslogMessageIF {
     protected String[] generateDateAndTime(Date date) {
         String[] dateAndTime = new String[2];
 
-        dateAndTime[0] = new SimpleDateFormat(getDateFormat()).format(date);
-        dateAndTime[1] = new SimpleDateFormat(getTimeFormat()).format(date);
+        dateAndTime[0] = new SimpleDateFormat(getDateFormat(), Locale.ENGLISH).format(date);
+        dateAndTime[1] = new SimpleDateFormat(getTimeFormat(), Locale.ENGLISH).format(date);
 
         return dateAndTime;
     }

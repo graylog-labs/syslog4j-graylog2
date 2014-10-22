@@ -1,15 +1,16 @@
 package org.graylog2.syslog4j.server.impl.event;
 
+import org.graylog2.syslog4j.SyslogConstants;
+import org.graylog2.syslog4j.server.SyslogServerEventIF;
+import org.graylog2.syslog4j.util.SyslogUtility;
+
 import java.net.InetAddress;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-
-import org.graylog2.syslog4j.SyslogConstants;
-import org.graylog2.syslog4j.server.SyslogServerEventIF;
-import org.graylog2.syslog4j.util.SyslogUtility;
+import java.util.Locale;
 
 /**
  * SyslogServerEvent provides an implementation of the SyslogServerEventIF interface.
@@ -91,7 +92,7 @@ public class SyslogServerEvent implements SyslogServerEventIF {
             String year = Integer.toString(Calendar.getInstance().get(Calendar.YEAR));
 
             String originalDate = this.message.substring(0, datelength - 1) + " " + year;
-            DateFormat dateFormat = new SimpleDateFormat(dateFormatS);
+            DateFormat dateFormat = new SimpleDateFormat(dateFormatS, Locale.ENGLISH);
             try {
                 this.date = dateFormat.parse(originalDate);
 

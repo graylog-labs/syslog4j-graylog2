@@ -8,6 +8,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
 import java.net.InetAddress;
+import java.util.Locale;
 
 /**
  * SyslogServerStructuredEvent provides an implementation of the
@@ -58,7 +59,7 @@ public class StructuredSyslogServerEvent extends SyslogServerEvent {
     }
 
     public void setDateTimeFormatter(Object dateTimeFormatter) {
-        this.dateTimeFormatter = (DateTimeFormatter) dateTimeFormatter;
+        this.dateTimeFormatter = ((DateTimeFormatter) dateTimeFormatter).withLocale(Locale.US);
     }
 
     protected void parseApplicationName() {
