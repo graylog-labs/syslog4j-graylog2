@@ -100,4 +100,69 @@ public class SyslogServerEventTest {
         assertEquals(event.getLevel(), 5);
         assertEquals(event.getMessage(), "10.0.0.99 Use the BFG!");
     }
+
+    @Test
+    public void testFacility12() throws Exception {
+        // Message from: https://tools.ietf.org/html/rfc3164#section-5.4
+        // Added pid to program.
+        // changed facility to 12
+        final String message = "<98>Oct 11 22:14:15 mymachine su[123]: 'su root' failed for lonvick on /dev/pts/8";
+
+        final SyslogServerEvent event = buildEvent(message);
+
+        assertEquals(event.getDate(), new DateTime(new DateTime().getYear() + "-10-11T22:14:15").toDate());
+        assertEquals(event.getFacility(), 12);
+        assertEquals(event.getHost(), "mymachine");
+        assertEquals(event.getLevel(), 2);
+        assertEquals(event.getMessage(), "mymachine su[123]: 'su root' failed for lonvick on /dev/pts/8");
+    }
+
+    @Test
+    public void testFacility13() throws Exception {
+        // Message from: https://tools.ietf.org/html/rfc3164#section-5.4
+        // Added pid to program.
+        // changed facility to 13
+        final String message = "<106>Oct 11 22:14:15 mymachine su[123]: 'su root' failed for lonvick on /dev/pts/8";
+
+        final SyslogServerEvent event = buildEvent(message);
+
+        assertEquals(event.getDate(), new DateTime(new DateTime().getYear() + "-10-11T22:14:15").toDate());
+        assertEquals(event.getFacility(), 13);
+        assertEquals(event.getHost(), "mymachine");
+        assertEquals(event.getLevel(), 2);
+        assertEquals(event.getMessage(), "mymachine su[123]: 'su root' failed for lonvick on /dev/pts/8");
+    }
+
+    @Test
+    public void testFacility14() throws Exception {
+        // Message from: https://tools.ietf.org/html/rfc3164#section-5.4
+        // Added pid to program.
+        // changed facility to 14
+        final String message = "<114>Oct 11 22:14:15 mymachine su[123]: 'su root' failed for lonvick on /dev/pts/8";
+
+        final SyslogServerEvent event = buildEvent(message);
+
+        assertEquals(event.getDate(), new DateTime(new DateTime().getYear() + "-10-11T22:14:15").toDate());
+        assertEquals(event.getFacility(), 14);
+        assertEquals(event.getHost(), "mymachine");
+        assertEquals(event.getLevel(), 2);
+        assertEquals(event.getMessage(), "mymachine su[123]: 'su root' failed for lonvick on /dev/pts/8");
+    }
+
+    @Test
+    public void testFacility15() throws Exception {
+        // Message from: https://tools.ietf.org/html/rfc3164#section-5.4
+        // Added pid to program.
+        // changed facility to 15
+        final String message = "<122>Oct 11 22:14:15 mymachine su[123]: 'su root' failed for lonvick on /dev/pts/8";
+
+        final SyslogServerEvent event = buildEvent(message);
+
+        assertEquals(event.getDate(), new DateTime(new DateTime().getYear() + "-10-11T22:14:15").toDate());
+        assertEquals(event.getFacility(), 15);
+        assertEquals(event.getHost(), "mymachine");
+        assertEquals(event.getLevel(), 2);
+        assertEquals(event.getMessage(), "mymachine su[123]: 'su root' failed for lonvick on /dev/pts/8");
+    }
+
 }

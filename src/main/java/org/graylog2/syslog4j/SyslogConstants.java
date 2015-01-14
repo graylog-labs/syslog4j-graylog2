@@ -88,6 +88,14 @@ public interface SyslogConstants extends Serializable {
     public static final int FACILITY_AUTHPRIV = 10 << 3;
     public static final int FACILITY_FTP = 11 << 3;
 
+    // add constants according to
+    // The BSD syslog Protocol, 4.1.1 PRI Part
+    // https://www.ietf.org/rfc/rfc3164.txt
+    public static final int FACILITY_NTP = 12 << 3;
+    public static final int FACILITY_AUDIT = 13 << 3;
+    public static final int FACILITY_ALERT = 14 << 3;
+    public static final int FACILITY_CLOCK2 = 15 << 3;
+
     public static final int FACILITY_LOCAL0 = 16 << 3;
     public static final int FACILITY_LOCAL1 = 17 << 3;
     public static final int FACILITY_LOCAL2 = 18 << 3;
