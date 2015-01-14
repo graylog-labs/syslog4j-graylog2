@@ -1,8 +1,5 @@
 package org.graylog2.syslog4j.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.graylog2.syslog4j.SyslogBackLogHandlerIF;
 import org.graylog2.syslog4j.SyslogConfigIF;
 import org.graylog2.syslog4j.SyslogIF;
@@ -15,6 +12,9 @@ import org.graylog2.syslog4j.impl.message.processor.structured.StructuredSyslogM
 import org.graylog2.syslog4j.impl.message.structured.StructuredSyslogMessage;
 import org.graylog2.syslog4j.impl.message.structured.StructuredSyslogMessageIF;
 import org.graylog2.syslog4j.util.SyslogUtility;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * AbstractSyslog provides a base abstract implementation of the SyslogIF.
@@ -115,7 +115,7 @@ public abstract class AbstractSyslog implements SyslogIF {
 
     public void log(int level, String message) {
         if (this.syslogConfig.isUseStructuredData()) {
-            StructuredSyslogMessageIF structuredMessage = new StructuredSyslogMessage(null, null, message);
+            StructuredSyslogMessageIF structuredMessage = new StructuredSyslogMessage(null, null, null, message);
 
             log(getStructuredMessageProcessor(), level, structuredMessage.createMessage());
 

@@ -1,12 +1,15 @@
 package org.graylog2.syslog4j.impl.message.structured;
 
-import java.util.HashMap;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
+import org.apache.commons.lang3.StringUtils;
+import org.graylog2.syslog4j.SyslogConstants;
+import org.graylog2.syslog4j.impl.message.AbstractSyslogMessage;
+
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
-import org.graylog2.syslog4j.SyslogConstants;
-import org.graylog2.syslog4j.impl.message.AbstractSyslogMessage;
 
 /**
  * SyslogStructuredMessage extends AbstractSyslogMessage's ability to provide
@@ -28,26 +31,26 @@ import org.graylog2.syslog4j.impl.message.AbstractSyslogMessage;
  * @version $Id: StructuredSyslogMessage.java,v 1.5 2010/09/11 16:49:24 cvs Exp $
  */
 public class StructuredSyslogMessage extends AbstractSyslogMessage implements StructuredSyslogMessageIF {
-    private static final long serialVersionUID = 3669887659567965965L;
-
     private String messageId;
-    private Map structuredData;
+    private Map<String, Map<String, String>> structuredData;
     private String message;
+    private String procId;
 
     private StructuredSyslogMessage() {
         this.messageId = null;
         this.message = null;
+        this.procId = null;
         this.structuredData = null;
     }
 
     /**
      * Constructs the {@link StructuredSyslogMessage} using MSGID,
      * STRUCTURED-DATA and MSG fields, as described in:
-     * <p/>
+     *
      * <p>
      * http://tools.ietf.org/html/draft-ietf-syslog-protocol-23#section-6
      * </p>
-     * <p/>
+     *
      * The Map must be a String -> (Map of String -> String), which encompasses
      * the STRUCTURED-DATA field described in above document.
      *
@@ -56,45 +59,14 @@ public class StructuredSyslogMessage extends AbstractSyslogMessage implements St
      * @param message
      */
     public StructuredSyslogMessage(final String messageId,
-                                   final Map structuredData, final String message) {
+                                   final String procId,
+                                   final Map<String, Map<String, String>> structuredData,
+                                   final String message) {
         super();
         this.messageId = messageId;
+        this.procId = procId;
         this.structuredData = structuredData;
         this.message = message;
-
-        ensureCorrectMapType();
-    }
-
-    private void ensureCorrectMapType() {
-        if (!(getStructuredData() == null)) {
-            Set sdEntrySet = getStructuredData().entrySet();
-            for (Iterator it = sdEntrySet.iterator(); it.hasNext(); ) {
-                Map.Entry sdEntry = (Map.Entry) it.next();
-                if (!(sdEntry.getKey() instanceof String)) {
-                    throw new IllegalArgumentException(
-                            "Structured data map must be a map of String -> (Map of String,String)");
-                }
-                if (!(sdEntry.getValue() instanceof Map)) {
-                    throw new IllegalArgumentException(
-                            "Structured data map must be a map of String -> (Map of String,String)");
-                }
-
-                Set entrySet = ((Map) sdEntry.getValue()).entrySet();
-                for (Iterator it2 = entrySet.iterator(); it2.hasNext(); ) {
-                    Map.Entry entry = (Map.Entry) it2.next();
-
-                    if (!(entry.getKey() instanceof String)) {
-                        throw new IllegalArgumentException(
-                                "Structured data map must be a map of String -> (Map of String,String)");
-                    }
-                    if (!(entry.getValue() instanceof String)) {
-                        throw new IllegalArgumentException(
-                                "Structured data map must be a map of String -> (Map of String,String)");
-                    }
-                }
-            }
-
-        }
     }
 
     /**
@@ -110,91 +82,82 @@ public class StructuredSyslogMessage extends AbstractSyslogMessage implements St
         return syslogMessage;
     }
 
-    private void deserialize(final String stringMessage) {
-        // Check correct format
-        if (stringMessage.indexOf('[') <= 0)
-            throw new IllegalArgumentException("Invalid Syslog string format: "
-                    + stringMessage);
+    private void  deserialize(final String stringMessage) {
 
+        int start = stringMessage.indexOf('[');
+        int end = -1;  
+
+         // Check correct format
+        if (start <= 0)
+            throw new IllegalArgumentException("Invalid Syslog string format: " + stringMessage);
+
+        //SYSLOG HEADER
         // Divide the string in 2 sections
-        final String syslogHeader = stringMessage.substring(0, stringMessage
-                .indexOf('['));
-        String structuredDataString = stringMessage.substring(stringMessage
-                .indexOf('['), stringMessage.lastIndexOf(']') + 1);
-
-        if ((stringMessage.lastIndexOf(']') + 2) <= stringMessage.length())
-            this.message = stringMessage.substring(stringMessage.lastIndexOf(']') + 2);
-
-        else {
-            this.message = "";
-        }
-
+        final String syslogHeader = stringMessage.substring(0, stringMessage.indexOf('['));
         // Split into tokens
         final String[] tokens = syslogHeader.split(" ");
 
         // Check number of tokens must be 1 -- rest of the header should already
         // be stripped
         if (tokens.length != 1) {
-            throw new IllegalArgumentException("Invalid Syslog string format: "
-                    + stringMessage);
+            throw new IllegalArgumentException("Invalid Syslog string format: " + stringMessage);
+        }
+        this.messageId = SyslogConstants.STRUCTURED_DATA_NILVALUE.equals(tokens[0]) ? null : tokens[0];
+
+        //STRUCTURED_DATA
+        if (stringMessage.contains(SyslogConstants.STRUCTURED_DATA_EMPTY_VALUE)){
+            this.structuredData = Collections.emptyMap();
+            end=stringMessage.indexOf(SyslogConstants.STRUCTURED_DATA_EMPTY_VALUE)+4;
+        } else {
+
+            final Map<String, Map<String, String>> structuredDataMap = Maps.newHashMap();
+
+            while(start < stringMessage.length() && matchChar(stringMessage, start, '[') == start) {
+                Preconditions.checkArgument(stringMessage.charAt(start) == '[', "Invalid structured data in syslog message '%s'", stringMessage);
+                end = matchChar(stringMessage, start, ']');
+                Preconditions.checkArgument(end != -1 && stringMessage.charAt(end) == ']', "Invalid structured data in syslog message '%s'", stringMessage);
+
+                String key = null;
+                Map<String, String> keyMap = Maps.newHashMap();
+                while (start < end) {
+                    if (key == null) {
+                        final int keyEnd = matchChar(stringMessage, ++start, ']', ' '); // Key can be terminated by a space (then more fields to follow) or a ]
+                        key = stringMessage.substring(start, keyEnd);
+                        start = keyEnd; // start either points after the end (then the while terminates) or at the first char of the first field.
+                    } else {
+                        Preconditions.checkArgument(start < stringMessage.length() && stringMessage.charAt(start) == ' ', "Invalid structured data in syslog message '%s'", stringMessage);
+                        start = start + 1; // Start points at the space behind either the key or the previous value
+                        Preconditions.checkArgument(key != null, "Invalid structured data in syslog message '%s'", stringMessage);
+                        final int equalsIndex = stringMessage.indexOf('=', start); // Equals terminates the field name.
+                        Preconditions.checkArgument(equalsIndex != -1, "Invalid structured data in syslog message '%s'", stringMessage);
+                        Preconditions.checkArgument(stringMessage.charAt(equalsIndex + 1) == '"', "Invalid structured data in syslog message '%s'", stringMessage);
+
+                        // Look for the end of the value. It needs to be terminated by "
+                        final int valueEnd = matchChar(stringMessage, equalsIndex + 2, '"');
+                        Preconditions.checkArgument(valueEnd !=  -1 && stringMessage.charAt(valueEnd) == '"', "Invalid structured data in syslog message '%s'", stringMessage);
+
+                        keyMap.put(stringMessage.substring(start, equalsIndex), unescape(stringMessage.substring(equalsIndex + 2, valueEnd)));
+                        start = valueEnd + 1;
+                    }
+                }
+                start++;
+                structuredDataMap.put(key, keyMap);
+            }
+            this.structuredData = structuredDataMap;
         }
 
-        this.messageId = SyslogConstants.STRUCTURED_DATA_NILVALUE.equals(tokens[0]) ? null
-                : tokens[0];
-
-        this.structuredData = new HashMap();
-        if (!SyslogConstants.STRUCTURED_DATA_EMPTY_VALUE.equals(structuredDataString)) {
-            while (!"".equals(structuredDataString)) {
-                if (!structuredDataString.startsWith("[")
-                        || structuredDataString.indexOf(']') == -1) {
-                    throw new IllegalArgumentException(
-                            "Invalid structured data format in Syslog message: "
-                                    + stringMessage);
-                }
-
-                final String structuredDataIteration = structuredDataString
-                        .substring(1, structuredDataString.indexOf(']'));
-
-                final Map iterMap = new HashMap();
-
-                final String[] params = structuredDataIteration.split(" ");
-
-                for (int i = 1; i < params.length; i++) {
-                    final String[] paramIter = params[i].split("=");
-                    if (paramIter.length != 2) {
-                        throw new IllegalArgumentException(
-                                "Invalid structured data format in Syslog message: "
-                                        + stringMessage);
-                    }
-
-                    if (!paramIter[1].startsWith("\"")
-                            || !paramIter[1].endsWith("\"")) {
-                        throw new IllegalArgumentException(
-                                "Invalid structured data format in Syslog message: "
-                                        + stringMessage);
-                    }
-
-                    iterMap.put(paramIter[0], paramIter[1].substring(1,
-                            paramIter[1].length() - 1));
-                }
-
-                this.structuredData.put(params[0], iterMap);
-
-                if (structuredDataString.indexOf(']') != structuredDataString
-                        .lastIndexOf(']')) {
-                    structuredDataString = structuredDataString
-                            .substring(structuredDataString.indexOf(']') + 1);
-                } else {
-                    structuredDataString = "";
-                }
-            }
+        //MESSAGE
+        if ((end + 2) <= stringMessage.length()){
+            this.message = stringMessage.substring(end + 2);
+        } else {
+            this.message = "";
         }
     }
 
     /**
      * Returns the MSGID field of the structured message format, as described
      * in:
-     * <p/>
+     *
      * <p>
      * http://tools.ietf.org/html/draft-ietf-syslog-protocol-23#section-6
      * </p>
@@ -208,20 +171,20 @@ public class StructuredSyslogMessage extends AbstractSyslogMessage implements St
     /**
      * Returns the structured data map. The Map is a String -> (Map of String ->
      * String), which encompasses the STRUCTURED-DATA field, as described in:
-     * <p/>
+     *
      * <p>
      * http://tools.ietf.org/html/draft-ietf-syslog-protocol-23#section-6
      * </p>
      *
      * @return Returns a Map object containing structured data.
      */
-    public Map getStructuredData() {
+    public Map<String, Map<String, String>> getStructuredData() {
         return this.structuredData;
     }
 
     /**
      * Returns the MSG field of the structured message format, as described in:
-     * <p/>
+     *
      * <p>
      * http://tools.ietf.org/html/draft-ietf-syslog-protocol-23#section-6
      * </p>
@@ -232,10 +195,15 @@ public class StructuredSyslogMessage extends AbstractSyslogMessage implements St
         return this.message;
     }
 
+    public String getProcId()
+    {
+        return procId;
+    }
+
     /*
      * (non-Javadoc)
      *
-     * @seeorg.productivity.java.syslog4j.impl.message.AbstractSyslogMessage#
+     * @see com.nesscomputing.syslog4j.impl.message.AbstractSyslogMessage#
      * createMessage()
      */
     public String createMessage() {
@@ -259,40 +227,31 @@ public class StructuredSyslogMessage extends AbstractSyslogMessage implements St
             // structured data present
             sb.append(SyslogConstants.STRUCTURED_DATA_EMPTY_VALUE);
         } else {
-            Set sdEntrySet = getStructuredData().entrySet();
-            for (Iterator it = sdEntrySet.iterator(); it.hasNext(); ) {
-                final Map.Entry sdElement = (Map.Entry) it.next();
-                final String sdId = (String) sdElement.getKey();
+            Set<Map.Entry<String, Map<String, String>>> sdEntrySet = getStructuredData().entrySet();
+            for (Iterator<Map.Entry<String, Map<String, String>>> it = sdEntrySet.iterator(); it.hasNext();) {
+                final Map.Entry<String, Map<String, String>> sdElement = it.next();
+                final String sdId = sdElement.getKey();
 
-                if (sdId == null || sdId.length() == 0
-                        || !StructuredSyslogMessage.checkIsPrintable(sdId)) {
-                    throw new IllegalArgumentException(
-                            "Illegal structured data id: " + sdId);
+                if (StringUtils.isBlank(sdId) || !StructuredSyslogMessage.checkIsPrintable(sdId)) {
+                    throw new IllegalArgumentException("Illegal structured data id: " + sdId);
                 }
 
                 sb.append('[').append(sdId);
 
-                final Map sdParams = (Map) sdElement.getValue();
+                final Map<String, String> sdParams = sdElement.getValue();
 
                 if (sdParams != null) {
-                    Set entrySet = sdParams.entrySet();
-                    for (Iterator it2 = entrySet.iterator(); it2.hasNext(); ) {
-                        Map.Entry entry = (Map.Entry) it2.next();
-                        final String paramName = (String) entry.getKey();
-                        final String paramValue = (String) entry.getValue();
+                    Set<Map.Entry<String, String>> entrySet = sdParams.entrySet();
+                    for (Iterator<Map.Entry<String, String>> it2 = entrySet.iterator(); it2.hasNext();) {
+                        Map.Entry<String, String> entry = it2.next();
+                        final String paramName = entry.getKey();
+                        final String paramValue = entry.getValue();
 
-                        if (paramName == null
-                                || paramName.length() == 0
-                                || !StructuredSyslogMessage
-                                .checkIsPrintable(paramName))
-                            throw new IllegalArgumentException(
-                                    "Illegal structured data parameter name: "
-                                            + paramName);
+                        if (StringUtils.isBlank(paramName) || !StructuredSyslogMessage.checkIsPrintable(paramName))
+                            throw new IllegalArgumentException("Illegal structured data parameter name: " + paramName);
 
                         if (paramValue == null)
-                            throw new IllegalArgumentException(
-                                    "Null structured data parameter value for parameter name: "
-                                            + paramName);
+                            throw new IllegalArgumentException("Null structured data parameter value for parameter name: " + paramName);
 
                         sb.append(' ');
                         sb.append(paramName);
@@ -306,7 +265,7 @@ public class StructuredSyslogMessage extends AbstractSyslogMessage implements St
             }
         }
 
-        if (getMessage() != null && getMessage().length() != 0) {
+        if (!StringUtils.isEmpty(getMessage())) {
             sb.append(' ');
             sb.append(StructuredSyslogMessage.nilProtect(getMessage()));
         }
@@ -342,11 +301,53 @@ public class StructuredSyslogMessage extends AbstractSyslogMessage implements St
     }
 
     public static String nilProtect(final String value) {
-        if (value == null || value.trim().length() == 0) {
+        if (StringUtils.isBlank(value)) {
             return SyslogConstants.STRUCTURED_DATA_NILVALUE;
         }
 
         return value;
+    }
+
+    public static int matchChar(final String data, final int start, final char ... matchChars)
+    {
+        int ptr = start;
+        for(;;) {
+            if (ptr >= data.length()) {
+                return -1;
+            }
+
+            if (data.charAt(ptr) == '\\') {
+                ptr++;
+                ptr++;
+                continue;
+            }
+
+            if (ptr >= data.length()) {
+                return -1;
+            }
+
+            for (int i = 0; i < matchChars.length; i++) {
+                if (data.charAt(ptr) == matchChars[i]) {
+                    return ptr;
+                }
+            }
+            ptr++;
+        }
+    }
+
+    private String unescape(final String str)
+    {
+        if (str.indexOf('\\') == -1) {
+            return str;
+        }
+        final StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < str.length(); i++) {
+            if (str.charAt(i) == '\\') {
+                continue;
+            }
+            sb.append(str.charAt(i));
+        }
+        return sb.toString();
     }
 
     public int hashCode() {

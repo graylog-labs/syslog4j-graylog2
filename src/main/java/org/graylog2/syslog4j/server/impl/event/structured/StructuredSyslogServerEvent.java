@@ -146,7 +146,7 @@ public class StructuredSyslogServerEvent extends SyslogServerEvent {
             // throw new SyslogRuntimeException(
             // "Message received is not a valid structured message: "
             // + getMessage(), e);
-            return new StructuredSyslogMessage(null, null, getMessage());
+            return new StructuredSyslogMessage(null, null, null, getMessage());
         }
     }
 }
