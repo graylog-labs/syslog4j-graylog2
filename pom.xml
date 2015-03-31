@@ -9,7 +9,7 @@
 
     <groupId>org.graylog2</groupId>
     <artifactId>syslog4j</artifactId>
-    <version>0.9.52-SNAPSHOT</version>
+    <version>0.9.52</version>
     <packaging>jar</packaging>
 
     <name>syslog4j-graylog2</name>
