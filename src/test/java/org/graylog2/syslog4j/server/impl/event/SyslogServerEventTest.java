@@ -1,12 +1,12 @@
 package org.graylog2.syslog4j.server.impl.event;
 
 import org.joda.time.DateTime;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
-import static org.testng.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 public class SyslogServerEventTest {
     private final InetAddress INET_ADDR = new InetSocketAddress(514).getAddress();
@@ -22,11 +22,11 @@ public class SyslogServerEventTest {
 
         final SyslogServerEvent event = buildEvent(message);
 
-        assertEquals(event.getDate(), new DateTime(new DateTime().getYear() + "-10-11T22:14:15").toDate());
-        assertEquals(event.getFacility(), 4);
-        assertEquals(event.getHost(), "mymachine");
-        assertEquals(event.getLevel(), 2);
-        assertEquals(event.getMessage(), "mymachine su: 'su root' failed for lonvick on /dev/pts/8");
+        assertEquals(new DateTime(new DateTime().getYear() + "-10-11T22:14:15").toDate(), event.getDate());
+        assertEquals(4, event.getFacility());
+        assertEquals("mymachine", event.getHost());
+        assertEquals(2, event.getLevel());
+        assertEquals("mymachine su: 'su root' failed for lonvick on /dev/pts/8", event.getMessage());
     }
 
     @Test
@@ -36,11 +36,11 @@ public class SyslogServerEventTest {
 
         final SyslogServerEvent event = buildEvent(message);
 
-        assertEquals(event.getDate(), new DateTime(new DateTime().getYear() + "-02-05T17:32:18").toDate());
-        assertEquals(event.getFacility(), 1);
-        assertEquals(event.getHost(), "10.0.0.99");
-        assertEquals(event.getLevel(), 5);
-        assertEquals(event.getMessage(), "10.0.0.99 Use the BFG!");
+        assertEquals(new DateTime(new DateTime().getYear() + "-02-05T17:32:18").toDate(), event.getDate());
+        assertEquals(1, event.getFacility());
+        assertEquals("10.0.0.99", event.getHost());
+        assertEquals(5, event.getLevel());
+        assertEquals("10.0.0.99 Use the BFG!", event.getMessage());
     }
 
     @Test
@@ -51,11 +51,11 @@ public class SyslogServerEventTest {
 
         final SyslogServerEvent event = buildEvent(message);
 
-        assertEquals(event.getDate(), new DateTime(new DateTime().getYear() + "-10-05T12:23:34").toDate());
-        assertEquals(event.getFacility(), 1);
-        assertEquals(event.getHost(), "hostname");
-        assertEquals(event.getLevel(), 3);
-        assertEquals(event.getMessage(), "hostname tag: hello world");
+        assertEquals(new DateTime(new DateTime().getYear() + "-10-05T12:23:34").toDate(), event.getDate());
+        assertEquals(1, event.getFacility());
+        assertEquals("hostname", event.getHost());
+        assertEquals(3, event.getLevel());
+        assertEquals("hostname tag: hello world", event.getMessage());
     }
 
     @Test
@@ -66,11 +66,11 @@ public class SyslogServerEventTest {
 
         final SyslogServerEvent event = buildEvent(message);
 
-        assertEquals(event.getDate(), new DateTime(new DateTime().getYear() + "-10-11T22:14:15").toDate());
-        assertEquals(event.getFacility(), 4);
-        assertEquals(event.getHost(), "mymachine");
-        assertEquals(event.getLevel(), 2);
-        assertEquals(event.getMessage(), "mymachine su[123]: 'su root' failed for lonvick on /dev/pts/8");
+        assertEquals(new DateTime(new DateTime().getYear() + "-10-11T22:14:15").toDate(), event.getDate());
+        assertEquals(4, event.getFacility());
+        assertEquals("mymachine", event.getHost());
+        assertEquals(2, event.getLevel());
+        assertEquals("mymachine su[123]: 'su root' failed for lonvick on /dev/pts/8", event.getMessage());
     }
 
     @Test
@@ -94,11 +94,11 @@ public class SyslogServerEventTest {
 
         final SyslogServerEvent event = buildEvent(message);
 
-        assertEquals(event.getDate(), new DateTime(new DateTime().getYear() + "-02-05T17:32:18").toDate());
-        assertEquals(event.getFacility(), 1);
-        assertEquals(event.getHost(), "10.0.0.99");
-        assertEquals(event.getLevel(), 5);
-        assertEquals(event.getMessage(), "10.0.0.99 Use the BFG!");
+        assertEquals(new DateTime(new DateTime().getYear() + "-02-05T17:32:18").toDate(), event.getDate());
+        assertEquals(1, event.getFacility());
+        assertEquals("10.0.0.99", event.getHost());
+        assertEquals(5, event.getLevel());
+        assertEquals("10.0.0.99 Use the BFG!", event.getMessage());
     }
 
     @Test
@@ -110,11 +110,11 @@ public class SyslogServerEventTest {
 
         final SyslogServerEvent event = buildEvent(message);
 
-        assertEquals(event.getDate(), new DateTime(new DateTime().getYear() + "-10-11T22:14:15").toDate());
-        assertEquals(event.getFacility(), 12);
-        assertEquals(event.getHost(), "mymachine");
-        assertEquals(event.getLevel(), 2);
-        assertEquals(event.getMessage(), "mymachine su[123]: 'su root' failed for lonvick on /dev/pts/8");
+        assertEquals(new DateTime(new DateTime().getYear() + "-10-11T22:14:15").toDate(), event.getDate());
+        assertEquals(12, event.getFacility());
+        assertEquals("mymachine", event.getHost());
+        assertEquals(2, event.getLevel());
+        assertEquals("mymachine su[123]: 'su root' failed for lonvick on /dev/pts/8", event.getMessage());
     }
 
     @Test
@@ -126,11 +126,11 @@ public class SyslogServerEventTest {
 
         final SyslogServerEvent event = buildEvent(message);
 
-        assertEquals(event.getDate(), new DateTime(new DateTime().getYear() + "-10-11T22:14:15").toDate());
-        assertEquals(event.getFacility(), 13);
-        assertEquals(event.getHost(), "mymachine");
-        assertEquals(event.getLevel(), 2);
-        assertEquals(event.getMessage(), "mymachine su[123]: 'su root' failed for lonvick on /dev/pts/8");
+        assertEquals(new DateTime(new DateTime().getYear() + "-10-11T22:14:15").toDate(), event.getDate());
+        assertEquals(13, event.getFacility());
+        assertEquals("mymachine", event.getHost());
+        assertEquals(2, event.getLevel());
+        assertEquals("mymachine su[123]: 'su root' failed for lonvick on /dev/pts/8", event.getMessage());
     }
 
     @Test
@@ -142,11 +142,11 @@ public class SyslogServerEventTest {
 
         final SyslogServerEvent event = buildEvent(message);
 
-        assertEquals(event.getDate(), new DateTime(new DateTime().getYear() + "-10-11T22:14:15").toDate());
-        assertEquals(event.getFacility(), 14);
-        assertEquals(event.getHost(), "mymachine");
-        assertEquals(event.getLevel(), 2);
-        assertEquals(event.getMessage(), "mymachine su[123]: 'su root' failed for lonvick on /dev/pts/8");
+        assertEquals(new DateTime(new DateTime().getYear() + "-10-11T22:14:15").toDate(), event.getDate());
+        assertEquals(14, event.getFacility());
+        assertEquals("mymachine", event.getHost());
+        assertEquals(2, event.getLevel());
+        assertEquals("mymachine su[123]: 'su root' failed for lonvick on /dev/pts/8", event.getMessage());
     }
 
     @Test
@@ -158,11 +158,11 @@ public class SyslogServerEventTest {
 
         final SyslogServerEvent event = buildEvent(message);
 
-        assertEquals(event.getDate(), new DateTime(new DateTime().getYear() + "-10-11T22:14:15").toDate());
-        assertEquals(event.getFacility(), 15);
-        assertEquals(event.getHost(), "mymachine");
-        assertEquals(event.getLevel(), 2);
-        assertEquals(event.getMessage(), "mymachine su[123]: 'su root' failed for lonvick on /dev/pts/8");
+        assertEquals(new DateTime(new DateTime().getYear() + "-10-11T22:14:15").toDate(), event.getDate());
+        assertEquals(15, event.getFacility());
+        assertEquals("mymachine", event.getHost());
+        assertEquals(2, event.getLevel());
+        assertEquals("mymachine su[123]: 'su root' failed for lonvick on /dev/pts/8", event.getMessage());
     }
 
 }
