@@ -65,6 +65,14 @@ public final class SyslogUtility implements SyslogConstants {
                 return "authpriv";
             case FACILITY_FTP:
                 return "ftp";
+            case FACILITY_NTP:
+                return "ntp";
+            case FACILITY_AUDIT:
+                return "audit";
+            case FACILITY_ALERT:
+                return "alert";
+            case FACILITY_CLOCK2:
+                return "clock2";
             case FACILITY_LOCAL0:
                 return "local0";
             case FACILITY_LOCAL1:
@@ -88,54 +96,59 @@ public final class SyslogUtility implements SyslogConstants {
     }
 
     public static final int getFacility(String facilityName) {
-        String _facilityName = facilityName;
 
         if (facilityName == null) {
             return -1;
-
-        } else {
-            _facilityName = facilityName.trim();
         }
+        String _facilityName = facilityName.trim();
 
         if ("KERN".equalsIgnoreCase(_facilityName)) {
             return FACILITY_KERN;
-        } else if ("USER".equalsIgnoreCase(facilityName)) {
+        } else if ("USER".equalsIgnoreCase(_facilityName)) {
             return FACILITY_USER;
-        } else if ("MAIL".equalsIgnoreCase(facilityName)) {
+        } else if ("MAIL".equalsIgnoreCase(_facilityName)) {
             return FACILITY_MAIL;
-        } else if ("DAEMON".equalsIgnoreCase(facilityName)) {
+        } else if ("DAEMON".equalsIgnoreCase(_facilityName)) {
             return FACILITY_DAEMON;
-        } else if ("AUTH".equalsIgnoreCase(facilityName)) {
+        } else if ("AUTH".equalsIgnoreCase(_facilityName)) {
             return FACILITY_AUTH;
-        } else if ("SYSLOG".equalsIgnoreCase(facilityName)) {
+        } else if ("SYSLOG".equalsIgnoreCase(_facilityName)) {
             return FACILITY_SYSLOG;
-        } else if ("LPR".equalsIgnoreCase(facilityName)) {
+        } else if ("LPR".equalsIgnoreCase(_facilityName)) {
             return FACILITY_LPR;
-        } else if ("NEWS".equalsIgnoreCase(facilityName)) {
+        } else if ("NEWS".equalsIgnoreCase(_facilityName)) {
             return FACILITY_NEWS;
-        } else if ("UUCP".equalsIgnoreCase(facilityName)) {
+        } else if ("UUCP".equalsIgnoreCase(_facilityName)) {
             return FACILITY_UUCP;
-        } else if ("CRON".equalsIgnoreCase(facilityName)) {
+        } else if ("CRON".equalsIgnoreCase(_facilityName)) {
             return FACILITY_CRON;
-        } else if ("AUTHPRIV".equalsIgnoreCase(facilityName)) {
+        } else if ("AUTHPRIV".equalsIgnoreCase(_facilityName)) {
             return FACILITY_AUTHPRIV;
-        } else if ("FTP".equalsIgnoreCase(facilityName)) {
+        } else if ("FTP".equalsIgnoreCase(_facilityName)) {
             return FACILITY_FTP;
-        } else if ("LOCAL0".equalsIgnoreCase(facilityName)) {
+        } else if ("NTP".equalsIgnoreCase(_facilityName)) {
+            return FACILITY_NTP;
+        } else if ("AUDIT".equalsIgnoreCase(_facilityName)) {
+            return FACILITY_AUDIT;
+        } else if ("ALERT".equalsIgnoreCase(_facilityName)) {
+            return FACILITY_ALERT;
+        } else if ("CLOCK2".equalsIgnoreCase(_facilityName)) {
+            return FACILITY_CLOCK2;
+        } else if ("LOCAL0".equalsIgnoreCase(_facilityName)) {
             return FACILITY_LOCAL0;
-        } else if ("LOCAL1".equalsIgnoreCase(facilityName)) {
+        } else if ("LOCAL1".equalsIgnoreCase(_facilityName)) {
             return FACILITY_LOCAL1;
-        } else if ("LOCAL2".equalsIgnoreCase(facilityName)) {
+        } else if ("LOCAL2".equalsIgnoreCase(_facilityName)) {
             return FACILITY_LOCAL2;
-        } else if ("LOCAL3".equalsIgnoreCase(facilityName)) {
+        } else if ("LOCAL3".equalsIgnoreCase(_facilityName)) {
             return FACILITY_LOCAL3;
-        } else if ("LOCAL4".equalsIgnoreCase(facilityName)) {
+        } else if ("LOCAL4".equalsIgnoreCase(_facilityName)) {
             return FACILITY_LOCAL4;
-        } else if ("LOCAL5".equalsIgnoreCase(facilityName)) {
+        } else if ("LOCAL5".equalsIgnoreCase(_facilityName)) {
             return FACILITY_LOCAL5;
-        } else if ("LOCAL6".equalsIgnoreCase(facilityName)) {
+        } else if ("LOCAL6".equalsIgnoreCase(_facilityName)) {
             return FACILITY_LOCAL6;
-        } else if ("LOCAL7".equalsIgnoreCase(facilityName)) {
+        } else if ("LOCAL7".equalsIgnoreCase(_facilityName)) {
             return FACILITY_LOCAL7;
         } else {
             return -1;
@@ -143,14 +156,10 @@ public final class SyslogUtility implements SyslogConstants {
     }
 
     public static final int getLevel(String levelName) {
-        String _levelName = levelName;
-
         if (levelName == null) {
             return -1;
-
-        } else {
-            _levelName = levelName.trim();
         }
+        String _levelName = levelName.trim();
 
         if ("DEBUG".equalsIgnoreCase(_levelName)) {
             return LEVEL_DEBUG;
