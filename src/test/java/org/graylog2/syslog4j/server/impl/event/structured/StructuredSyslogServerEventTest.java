@@ -101,7 +101,7 @@ public class StructuredSyslogServerEventTest {
 
         assertEquals(null, event.getStructuredMessage().getStructuredData());
         assertEquals(null, event.getStructuredMessage().getMessageId());
-        assertEquals("- - tralala", event.getStructuredMessage().getMessage());
+        assertEquals("tralala", event.getStructuredMessage().getMessage());
     }
 
     @Test
@@ -160,7 +160,7 @@ public class StructuredSyslogServerEventTest {
 
         assertEquals(null, event.getStructuredMessage().getStructuredData());
         assertEquals(null, event.getStructuredMessage().getMessageId());
-        assertEquals("- - %% It's time to make the do-nuts.", event.getStructuredMessage().getMessage());
+        assertEquals("%% It's time to make the do-nuts.", event.getStructuredMessage().getMessage());
     }
 
     @Test

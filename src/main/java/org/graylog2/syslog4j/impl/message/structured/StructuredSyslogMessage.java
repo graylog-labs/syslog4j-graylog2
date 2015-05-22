@@ -31,6 +31,9 @@ import java.util.Set;
  * @version $Id: StructuredSyslogMessage.java,v 1.5 2010/09/11 16:49:24 cvs Exp $
  */
 public class StructuredSyslogMessage extends AbstractSyslogMessage implements StructuredSyslogMessageIF {
+    public static final String EMPTY_STRUCTURED_DATA_PREFIX = "- - ";
+    public static final int EMPTY_STRUCTURED_DATA_PREFIX_LENGTH = EMPTY_STRUCTURED_DATA_PREFIX.length();
+
     private String messageId;
     private Map<String, Map<String, String>> structuredData;
     private String message;
@@ -83,6 +86,14 @@ public class StructuredSyslogMessage extends AbstractSyslogMessage implements St
     }
 
     private void  deserialize(final String stringMessage) {
+
+        // Check if the RFC5424 MSGID and STRUCTURED-DATA fields are empty.
+        // This avoids throwing an exception and also strips the "- - " from the message.
+        // See: https://github.com/Graylog2/graylog2-server/issues/1161
+        if (stringMessage.startsWith(EMPTY_STRUCTURED_DATA_PREFIX)) {
+            this.message = stringMessage.substring(EMPTY_STRUCTURED_DATA_PREFIX_LENGTH);
+            return;
+        }
 
         int start = stringMessage.indexOf('[');
         int end = -1;  
