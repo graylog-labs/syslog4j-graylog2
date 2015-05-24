@@ -269,4 +269,14 @@ public class StructuredSyslogMessageTest extends TestCase
         assertTrue((message.getStructuredData().get("data1")).size() == 1);
         assertEquals("b", message.getStructuredData().get("data1").get("a"));
     }
+
+    public void testMessageWithoutIdOrStructuredData()
+    {
+        final String messageStr = "- - TEST";
+        final StructuredSyslogMessage message = StructuredSyslogMessage.fromString(messageStr);
+
+        assertEquals("TEST", message.getMessage());
+        assertNull(message.getMessageId());
+        assertNull(message.getStructuredData());
+    }
 }
