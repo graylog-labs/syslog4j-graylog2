@@ -257,4 +257,26 @@ public class StructuredSyslogMessageTest extends TestCase
        Assert.assertNotNull(msg.getStructuredData().get("rh@12345"));
        Assert.assertEquals("hell0 7|133454|00022f444ad7fe10ef5d0d536ae879f1", msg.getStructuredData().get("rh@12345").get("xxx"));
     }
+
+    public void testMessageWithTwoDashes()
+    {
+        final String messageStr = "msgId1 [data1 a=\"b\"] - - TEST";
+        final StructuredSyslogMessage message = StructuredSyslogMessage.fromString(messageStr);
+
+        assertEquals("- - TEST", message.getMessage());
+        assertEquals("msgId1", message.getMessageId());
+        assertTrue(message.getStructuredData().size() == 1);
+        assertTrue((message.getStructuredData().get("data1")).size() == 1);
+        assertEquals("b", message.getStructuredData().get("data1").get("a"));
+    }
+
+    public void testMessageWithoutIdOrStructuredData()
+    {
+        final String messageStr = "- - TEST";
+        final StructuredSyslogMessage message = StructuredSyslogMessage.fromString(messageStr);
+
+        assertEquals("TEST", message.getMessage());
+        assertNull(message.getMessageId());
+        assertTrue(message.getStructuredData().isEmpty());
+    }
 }
