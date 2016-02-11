@@ -1,5 +1,7 @@
 package org.graylog2.syslog4j;
 
+import java.util.Date;
+
 /**
  * SyslogIF provides a common interface for all Syslog4j client implementations.
  * <p/>
@@ -20,8 +22,10 @@ public interface SyslogIF extends SyslogConstants {
     public void backLog(int level, String message, Throwable reasonThrowable);
 
     public void backLog(int level, String message, String reason);
-
+    
     public void log(int level, String message);
+
+    public void log(int level, String message, Date datetime);
 
     public void debug(String message);
 

@@ -24,6 +24,9 @@ public interface SyslogConstants extends Serializable {
 
     public static final String STRUCTURED_DATA_NILVALUE = "-";
     public static final String STRUCTURED_DATA_EMPTY_VALUE = "[0@0]";
+    public static final String SYSLOG_DATEFORMAT_RFC5424  = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+    public static final int    MAX_MESSAGE_LENGTH_RFC5424 =  2048;
+    public static final int    MIN_MESSAGE_LENGTH_RFC5424 =  480;
 
     public static final String CHAR_SET_DEFAULT = "UTF-8";
 

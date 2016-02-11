@@ -14,6 +14,7 @@ import org.graylog2.syslog4j.impl.message.structured.StructuredSyslogMessageIF;
 import org.graylog2.syslog4j.util.SyslogUtility;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -123,6 +124,17 @@ public abstract class AbstractSyslog implements SyslogIF {
             log(getMessageProcessor(), level, message);
         }
     }
+    
+    public void log(int level, String message, Date datetime) {
+        if (this.syslogConfig.isUseStructuredData()) {
+            StructuredSyslogMessageIF structuredMessage = new StructuredSyslogMessage(null, null, null, message);
+
+            log(getStructuredMessageProcessor(), level, structuredMessage.createMessage(), datetime);
+
+        } else {
+            log(getMessageProcessor(), level, message, datetime);
+        }
+    }
 
     public void log(int level, SyslogMessageIF message) {
         if (message instanceof StructuredSyslogMessageIF) {
@@ -223,7 +235,8 @@ public abstract class AbstractSyslog implements SyslogIF {
         }
 
         try {
-            write(messageProcessor, level, _message);
+            String header = messageProcessor.createSyslogHeader(this.syslogConfig.getFacility(), level, this.syslogConfig.getLocalName(), this.syslogConfig.isSendLocalTimestamp(), this.syslogConfig.isSendLocalName());
+            write(messageProcessor, level, _message, header);
 
         } catch (SyslogRuntimeException sre) {
             if (sre.getCause() != null) {
@@ -239,15 +252,50 @@ public abstract class AbstractSyslog implements SyslogIF {
         }
     }
 
-    protected void write(SyslogMessageProcessorIF messageProcessor, int level, String message) throws SyslogRuntimeException {
-        String header = messageProcessor.createSyslogHeader(this.syslogConfig.getFacility(), level, this.syslogConfig.getLocalName(), this.syslogConfig.isSendLocalTimestamp(), this.syslogConfig.isSendLocalName());
+    public void log(SyslogMessageProcessorIF messageProcessor, int level, String message, Date datetime) {
+        String _message = null;
 
+        if (this.syslogConfig.isIncludeIdentInMessageModifier()) {
+            _message = prefixMessage(message, IDENT_SUFFIX_DEFAULT);
+            _message = modifyMessage(level, _message);
+
+        } else {
+            _message = modifyMessage(level, message);
+            _message = prefixMessage(_message, IDENT_SUFFIX_DEFAULT);
+        }
+
+        try {
+        	String header = messageProcessor.createSyslogHeader(this.syslogConfig.getFacility(), level, this.syslogConfig.getLocalName(), this.syslogConfig.isSendLocalName(), datetime);
+            write(messageProcessor, level, _message, header);
+
+        } catch (SyslogRuntimeException sre) {
+            if (sre.getCause() != null) {
+                backLog(level, _message, sre.getCause());
+
+            } else {
+                backLog(level, _message, sre);
+            }
+
+            if (this.syslogConfig.isThrowExceptionOnWrite()) {
+                throw sre;
+            }
+        }
+    }
+    
+    protected void write(SyslogMessageProcessorIF messageProcessor, int level, String message, String header) throws SyslogRuntimeException {
+ 
         byte[] h = SyslogUtility.getBytes(this.syslogConfig, header);
         byte[] m = SyslogUtility.getBytes(this.syslogConfig, message);
 
         int mLength = m.length;
+        int hLength = h.length;
+        int expectedMinLength = this.syslogConfig.getMinMessageLength();
+        
+        if (mLength < expectedMinLength) {
+        	throw new SyslogRuntimeException("Message length is: " + String.valueOf(mLength) + " but expected to be at least: " + String.valueOf(expectedMinLength));
+        }
 
-        int availableLen = this.syslogConfig.getMaxMessageLength() - h.length;
+        int availableLen = this.syslogConfig.getMaxMessageLength() - hLength;
 
         if (this.syslogConfig.isTruncateMessage()) {
             if (availableLen > 0 && mLength > availableLen) {

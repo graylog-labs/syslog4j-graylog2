@@ -1,5 +1,7 @@
 package org.graylog2.syslog4j.impl.multiple;
 
+import java.util.Date;
+
 import org.graylog2.syslog4j.Syslog;
 import org.graylog2.syslog4j.SyslogConfigIF;
 import org.graylog2.syslog4j.SyslogConstants;
@@ -171,4 +173,9 @@ public class MultipleSyslog implements SyslogIF {
     public String getProtocol() {
         return this.syslogProtocol;
     }
+
+	public void log(int level, String message, Date datetime) {
+
+	}
+
 }

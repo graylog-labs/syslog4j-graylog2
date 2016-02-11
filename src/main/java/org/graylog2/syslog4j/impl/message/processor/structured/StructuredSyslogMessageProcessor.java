@@ -1,7 +1,12 @@
 package org.graylog2.syslog4j.impl.message.processor.structured;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
+import org.graylog2.syslog4j.SyslogConstants;
 import org.graylog2.syslog4j.impl.message.processor.AbstractSyslogMessageProcessor;
 import org.graylog2.syslog4j.impl.message.structured.StructuredSyslogMessage;
 
@@ -29,16 +34,16 @@ import org.graylog2.syslog4j.impl.message.structured.StructuredSyslogMessage;
  * @version $Id: StructuredSyslogMessageProcessor.java,v 1.4 2011/01/11 05:11:13 cvs Exp $
  */
 public class StructuredSyslogMessageProcessor extends AbstractSyslogMessageProcessor {
-    private static final long serialVersionUID = -1563777226913475257L;
-
+    private static final long   serialVersionUID = -1563777226913475257L;    
+    
     public static String VERSION = "1";
+    
+    private static final  StructuredSyslogMessageProcessor INSTANCE = new StructuredSyslogMessageProcessor();
 
-    private static final StructuredSyslogMessageProcessor INSTANCE = new StructuredSyslogMessageProcessor();
     protected static StructuredSyslogMessageProcessor defaultInstance = INSTANCE;
 
-    private String applicationName = STRUCTURED_DATA_APP_NAME_DEFAULT_VALUE;
-    private String processId = STRUCTURED_DATA_PROCESS_ID_DEFAULT_VALUE;
-
+    private String            applicationName   = STRUCTURED_DATA_APP_NAME_DEFAULT_VALUE;
+    private String            processId         = STRUCTURED_DATA_PROCESS_ID_DEFAULT_VALUE;
     private DateTimeFormatter dateTimeFormatter = ISODateTimeFormat.dateTime();
 
     public static void setDefault(StructuredSyslogMessageProcessor messageProcessor) {
@@ -84,23 +89,53 @@ public class StructuredSyslogMessageProcessor extends AbstractSyslogMessageProce
         this.processId = processId;
     }
 
-    public String createSyslogHeader(final int facility, final int level, String localName, final boolean sendLocalTimestamp, final boolean sendLocalName) {
-        final StringBuffer buffer = new StringBuffer();
+	/* (non-Javadoc)
+	 * @see org.graylog2.syslog4j.impl.message.processor.AbstractSyslogMessageProcessor#appendTimestamp(java.lang.StringBuffer, java.util.Date)
+	 * 
+	 * This is compatible with RFC5424 protocol.
+	 */
+	@Override
+    public void appendTimestamp(StringBuffer buffer, Date datetime) {
+        SimpleDateFormat formatter = new SimpleDateFormat(SyslogConstants.SYSLOG_DATEFORMAT_RFC5424);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(datetime.getTime());
+        String formatedTimestamp = formatter.format(calendar.getTime());
+        buffer.append(formatedTimestamp);	
+        buffer.append(' ');
+    }
 
+    /* (non-Javadoc)
+     * @see org.graylog2.syslog4j.SyslogMessageProcessorIF#createSyslogHeader(int, int, java.lang.String, boolean, boolean)
+     * 
+     * This is compatible with RFC5424 protocol.
+     * 
+     * RFC5424 does not allow flags of sendLocalTimestamp and sendLocalName be off and therefore the incoming flags will not be used in this method.
+     * 
+     */
+    public String createSyslogHeader(int facility, int level, String localName, boolean sendLocalTimestamp, boolean sendLocalName) {
+        return createSyslogHeaderInner(facility, level, localName, new Date());
+    }
+
+    /* (non-Javadoc)
+     * @see org.graylog2.syslog4j.SyslogMessageProcessorIF#createSyslogHeader(int, int, java.lang.String, boolean, java.util.Date)
+     * 
+     * This is compatible with RFC5424 protocol.
+     * 
+     * RFC5424 does not allow sendLocalName flag to be off and therefore sendLocalName will not be used in this method.
+     */
+    public String createSyslogHeader(int facility, int level, String localName, boolean sendLocalName, Date datetime) { 	
+    	return createSyslogHeaderInner(facility, level, localName, datetime);
+    }
+    
+    private String createSyslogHeaderInner(int facility, int level, String localName, Date datetime) {
+        StringBuffer buffer = new StringBuffer();
         appendPriority(buffer, facility, level);
         buffer.append(VERSION);
         buffer.append(' ');
-
-        getDateTimeFormatter().printTo(buffer, System.currentTimeMillis());
-        buffer.append(' ');
-
+        appendTimestamp(buffer, datetime);
         appendLocalName(buffer, localName);
-
-        buffer.append(StructuredSyslogMessage.nilProtect(this.applicationName))
-                .append(' ');
-
+        buffer.append(StructuredSyslogMessage.nilProtect(this.applicationName)).append(' ');
         buffer.append(StructuredSyslogMessage.nilProtect(this.processId)).append(' ');
-
         return buffer.toString();
     }
 }

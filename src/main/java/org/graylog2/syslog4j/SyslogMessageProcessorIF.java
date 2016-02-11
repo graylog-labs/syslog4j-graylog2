@@ -1,6 +1,7 @@
 package org.graylog2.syslog4j;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * SyslogMessageProcessorIF provides an extensible interface for writing custom
@@ -19,4 +20,6 @@ public interface SyslogMessageProcessorIF extends Serializable {
     public byte[] createPacketData(byte[] header, byte[] message, int start, int length);
 
     public byte[] createPacketData(byte[] header, byte[] message, int start, int length, byte[] splitBeginText, byte[] splitEndText);
+
+    public String createSyslogHeader(int facility, int level, String localName, boolean sendLocalName, Date datetime);
 }

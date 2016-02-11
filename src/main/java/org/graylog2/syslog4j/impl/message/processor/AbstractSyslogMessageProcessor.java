@@ -1,8 +1,6 @@
 package org.graylog2.syslog4j.impl.message.processor;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 import org.graylog2.syslog4j.SyslogConstants;
 import org.graylog2.syslog4j.SyslogMessageProcessorIF;
@@ -74,21 +72,6 @@ public abstract class AbstractSyslogMessageProcessor implements SyslogMessagePro
         buffer.append(">");
     }
 
-    protected void appendLocalTimestamp(StringBuffer buffer) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(SYSLOG_DATEFORMAT, Locale.ENGLISH);
-
-        String datePrefix = dateFormat.format(new Date());
-
-        int pos = buffer.length() + 4;
-
-        buffer.append(datePrefix);
-
-        //  RFC 3164 requires leading space for days 1-9
-        if (buffer.charAt(pos) == '0') {
-            buffer.setCharAt(pos, ' ');
-        }
-    }
-
     protected void appendLocalName(StringBuffer buffer, String localName) {
         if (localName != null) {
             buffer.append(localName);
@@ -99,20 +82,7 @@ public abstract class AbstractSyslogMessageProcessor implements SyslogMessagePro
 
         buffer.append(' ');
     }
-
-    public String createSyslogHeader(int facility, int level, String localName, boolean sendLocalTimestamp, boolean sendLocalName) {
-        StringBuffer buffer = new StringBuffer();
-
-        appendPriority(buffer, facility, level);
-
-        if (sendLocalTimestamp) {
-            appendLocalTimestamp(buffer);
-        }
-
-        if (sendLocalName) {
-            appendLocalName(buffer, localName);
-        }
-
-        return buffer.toString();
-    }
+    
+    protected abstract void appendTimestamp(StringBuffer buffer, Date datetime);
+    
 }
