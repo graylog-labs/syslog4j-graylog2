@@ -62,8 +62,4 @@ public interface AbstractSyslogConfigIF extends SyslogConfigIF {
      * @param maxQueueSize
      */
     public void setMaxQueueSize(int maxQueueSize);
-   
-    public int getMinMessageLength();
-
-    public void setMinMessageLength(int minMessageLength);
 }

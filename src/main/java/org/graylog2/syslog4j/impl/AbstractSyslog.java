@@ -288,14 +288,8 @@ public abstract class AbstractSyslog implements SyslogIF {
         byte[] m = SyslogUtility.getBytes(this.syslogConfig, message);
 
         int mLength = m.length;
-        int hLength = h.length;
-        int expectedMinLength = this.syslogConfig.getMinMessageLength();
-        
-        if (mLength < expectedMinLength) {
-        	throw new SyslogRuntimeException("Message length is: " + String.valueOf(mLength) + " but expected to be at least: " + String.valueOf(expectedMinLength));
-        }
 
-        int availableLen = this.syslogConfig.getMaxMessageLength() - hLength;
+        int availableLen = this.syslogConfig.getMaxMessageLength() - h.length;
 
         if (this.syslogConfig.isTruncateMessage()) {
             if (availableLen > 0 && mLength > availableLen) {

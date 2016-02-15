@@ -46,7 +46,6 @@ public abstract class AbstractSyslogConfig implements AbstractSyslogConfigIF {
     protected boolean throwExceptionOnInitialize = THROW_EXCEPTION_ON_INITIALIZE_DEFAULT;
 
     protected int maxMessageLength = MAX_MESSAGE_LENGTH_DEFAULT;
-    protected int minMessageLength = 0;
     protected byte[] splitMessageBeginText = SPLIT_MESSAGE_BEGIN_TEXT_DEFAULT.getBytes();
     protected byte[] splitMessageEndText = SPLIT_MESSAGE_END_TEXT_DEFAULT.getBytes();
 
@@ -128,14 +127,6 @@ public abstract class AbstractSyslogConfig implements AbstractSyslogConfigIF {
 
     public void setMaxMessageLength(int maxMessageLength) {
         this.maxMessageLength = maxMessageLength;
-    }
-    
-    public int getMinMessageLength() {
-        return this.minMessageLength;
-    }
-
-    public void setMinMessageLength(int minMessageLength) {
-        this.minMessageLength = minMessageLength;
     }
 
     public boolean isSendLocalTimestamp() {
@@ -381,7 +372,6 @@ public abstract class AbstractSyslogConfig implements AbstractSyslogConfigIF {
     public void setUseStructuredData(boolean useStructuredData) {
         this.useStructuredData = useStructuredData;
         setMaxMessageLength(SyslogConstants.MAX_MESSAGE_LENGTH_RFC5424);
-        setMinMessageLength(SyslogConstants.MIN_MESSAGE_LENGTH_RFC5424);
     }
 
     public Class getSyslogWriterClass() {
