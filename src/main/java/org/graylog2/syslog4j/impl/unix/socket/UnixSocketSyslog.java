@@ -1,6 +1,7 @@
 package org.graylog2.syslog4j.impl.unix.socket;
 
 import java.nio.ByteBuffer;
+import java.util.Collections;
 import java.util.List;
 
 import org.graylog2.syslog4j.SyslogRuntimeException;
