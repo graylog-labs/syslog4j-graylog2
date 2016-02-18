@@ -2,6 +2,7 @@ syslog4j
 ========
 
 [![Build Status](https://travis-ci.org/Graylog2/syslog4j-graylog2.svg)](https://travis-ci.org/Graylog2/syslog4j-graylog2)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.graylog2/syslog4j/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.graylog2/syslog4j)
 
 Syslog4j provides client and server implementations of the BSD Syslog protocol
 (RFC 3164) and the draft "structured syslog" protocol (RFC Draft).
