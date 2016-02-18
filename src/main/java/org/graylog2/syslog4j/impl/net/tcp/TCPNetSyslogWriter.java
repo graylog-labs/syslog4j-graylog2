@@ -129,7 +129,6 @@ public class TCPNetSyslogWriter extends AbstractSyslogWriter {
 
     public void write(byte[] message) throws SyslogRuntimeException {
         Socket currentSocket = null;
-
         int attempts = 0;
         while (attempts != -1 && attempts < (this.tcpNetSyslogConfig.getWriteRetries() + 1)) {
             try {
@@ -140,17 +139,25 @@ public class TCPNetSyslogWriter extends AbstractSyslogWriter {
                 }
 
                 OutputStream os = currentSocket.getOutputStream();
-
-                if (this.tcpNetSyslogConfig.isSetBufferSize()) {
-                    currentSocket.setSendBufferSize(message.length);
+                
+                String frameHeader = "";
+                if(this.tcpNetSyslogConfig.isUseFrameHeader()){
+                	frameHeader = message.length + " ";
                 }
-
+                
+                if (this.tcpNetSyslogConfig.isSetBufferSize()) {
+                    currentSocket.setSendBufferSize(message.length + frameHeader.length());
+                }
+                
+                os.write(frameHeader.getBytes());
                 os.write(message);
 
-                byte[] delimiterSequence = this.tcpNetSyslogConfig.getDelimiterSequence();
-                if (delimiterSequence != null && delimiterSequence.length > 0) {
-                    os.write(delimiterSequence);
-                }
+                if(!this.tcpNetSyslogConfig.isUseFrameHeader()) {
+                	byte[] delimiterSequence = this.tcpNetSyslogConfig.getDelimiterSequence();
+                    if (delimiterSequence != null && delimiterSequence.length > 0) {
+                        os.write(delimiterSequence);
+                    }
+                }               
 
                 this.syslog.setBackLogStatus(false);
 

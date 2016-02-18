@@ -45,4 +45,8 @@ public interface TCPNetSyslogConfigIF extends AbstractNetSyslogConfigIF {
     public int getFreshConnectionInterval();
 
     public void setFreshConnectionInterval(int interval);
+
+    public void setUseFrameHeader(boolean useFrameHeader);
+    
+	public boolean isUseFrameHeader();
 }

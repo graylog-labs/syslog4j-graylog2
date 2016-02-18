@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.graylog2.syslog4j.SyslogBackLogHandlerIF;
+import org.graylog2.syslog4j.SyslogConstants;
 import org.graylog2.syslog4j.SyslogMessageModifierIF;
 import org.graylog2.syslog4j.SyslogRuntimeException;
 import org.graylog2.syslog4j.impl.backlog.printstream.SystemErrSyslogBackLogHandler;
@@ -370,6 +371,7 @@ public abstract class AbstractSyslogConfig implements AbstractSyslogConfigIF {
 
     public void setUseStructuredData(boolean useStructuredData) {
         this.useStructuredData = useStructuredData;
+        setMaxMessageLength(SyslogConstants.MAX_MESSAGE_LENGTH_RFC5424);
     }
 
     public Class getSyslogWriterClass() {

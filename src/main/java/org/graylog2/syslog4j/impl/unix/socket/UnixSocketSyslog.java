@@ -1,6 +1,7 @@
 package org.graylog2.syslog4j.impl.unix.socket;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 
 import org.graylog2.syslog4j.SyslogRuntimeException;
 import org.graylog2.syslog4j.impl.AbstractSyslog;
@@ -39,6 +40,11 @@ public class UnixSocketSyslog extends AbstractSyslog {
             System.arraycopy(sunPath.getBytes(), 0, this.sun_path, 0, sunPath.length());
             System.arraycopy(ZERO_BYTE, 0, this.sun_path, sunPath.length(), 1);
         }
+
+		@Override
+		protected List getFieldOrder() {
+			return Collections.emptyList();
+		}
     }
 
     protected interface CLibrary extends Library {
