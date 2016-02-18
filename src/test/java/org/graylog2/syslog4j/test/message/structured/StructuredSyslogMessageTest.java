@@ -48,13 +48,13 @@ package org.graylog2.syslog4j.test.message.structured;
 // Date: Jul 15, 2009
 // ---------------------
 
-import com.google.common.collect.Maps;
 import junit.framework.TestCase;
 import org.graylog2.syslog4j.impl.message.structured.StructuredSyslogMessage;
 import org.graylog2.syslog4j.server.impl.event.structured.StructuredSyslogServerEvent;
 import org.junit.Assert;
 
 import java.net.InetAddress;
+import java.util.HashMap;
 import java.util.Map;
 
 public class StructuredSyslogMessageTest extends TestCase
@@ -123,7 +123,7 @@ public class StructuredSyslogMessageTest extends TestCase
           fail();
 
       } catch (IllegalArgumentException iae) {
-          //
+          assertEquals("Invalid structured data in syslog message 'msgId1 [invalid SD] my message!!'", iae.getMessage());
       }
    }
 
@@ -136,7 +136,7 @@ public class StructuredSyslogMessageTest extends TestCase
           fail();
 
        } catch (IllegalArgumentException iae) {
-           //
+          assertEquals("Invalid structured data in syslog message 'msgId1 [data1 a=b] my message!!'", iae.getMessage());
        }
    }
 
@@ -149,7 +149,7 @@ public class StructuredSyslogMessageTest extends TestCase
           fail();
 
        } catch (IllegalArgumentException iae) {
-           //
+          assertEquals("Invalid structured data in syslog message 'msgId1 [data1 a=\"b] my message!!'", iae.getMessage());
        }
    }
 
@@ -162,7 +162,7 @@ public class StructuredSyslogMessageTest extends TestCase
           fail();
 
       } catch (IllegalArgumentException iae) {
-          //
+          assertEquals("Invalid structured data in syslog message 'msgId1 [data1 a=b\"] my message!!'", iae.getMessage());
       }
 
    }
@@ -214,13 +214,13 @@ public class StructuredSyslogMessageTest extends TestCase
    public void testCreateMessage3()
    {
       final StructuredSyslogMessage message =
-            new StructuredSyslogMessage("msgId", null, Maps.<String, Map<String, String>>newHashMap(), "my message");
+            new StructuredSyslogMessage("msgId", null, new HashMap<String, Map<String, String>>(), "my message");
       assertEquals("msgId [0@0] my message", message.createMessage());
    }
 
    public void testCreateMessage4()
    {
-      final Map<String, Map<String, String>> map = Maps.newHashMap();
+      final Map<String, Map<String, String>> map = new HashMap<String, Map<String, String>>();
       final StructuredSyslogMessage message =
             new StructuredSyslogMessage("msgId", null, map, "my message");
       assertEquals("msgId [0@0] my message", message.createMessage());

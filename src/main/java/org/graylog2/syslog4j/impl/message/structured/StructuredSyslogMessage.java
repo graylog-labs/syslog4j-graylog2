@@ -1,12 +1,12 @@
 package org.graylog2.syslog4j.impl.message.structured;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog2.syslog4j.SyslogConstants;
 import org.graylog2.syslog4j.impl.message.AbstractSyslogMessage;
+import org.graylog2.syslog4j.util.Preconditions;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -121,7 +121,7 @@ public class StructuredSyslogMessage extends AbstractSyslogMessage implements St
             end=stringMessage.indexOf(SyslogConstants.STRUCTURED_DATA_EMPTY_VALUE)+4;
         } else {
 
-            final Map<String, Map<String, String>> structuredDataMap = Maps.newHashMap();
+            final Map<String, Map<String, String>> structuredDataMap = new HashMap<String, Map<String, String>>();
 
             while(start < stringMessage.length() && matchChar(stringMessage, start, '[') == start) {
                 Preconditions.checkArgument(stringMessage.charAt(start) == '[', "Invalid structured data in syslog message '%s'", stringMessage);
@@ -129,7 +129,7 @@ public class StructuredSyslogMessage extends AbstractSyslogMessage implements St
                 Preconditions.checkArgument(end != -1 && stringMessage.charAt(end) == ']', "Invalid structured data in syslog message '%s'", stringMessage);
 
                 String key = null;
-                Map<String, String> keyMap = Maps.newHashMap();
+                Map<String, String> keyMap = new HashMap<String, String>();
                 while (start < end) {
                     if (key == null) {
                         final int keyEnd = matchChar(stringMessage, ++start, ']', ' '); // Key can be terminated by a space (then more fields to follow) or a ]
@@ -138,7 +138,6 @@ public class StructuredSyslogMessage extends AbstractSyslogMessage implements St
                     } else {
                         Preconditions.checkArgument(start < stringMessage.length() && stringMessage.charAt(start) == ' ', "Invalid structured data in syslog message '%s'", stringMessage);
                         start = start + 1; // Start points at the space behind either the key or the previous value
-                        Preconditions.checkArgument(key != null, "Invalid structured data in syslog message '%s'", stringMessage);
                         final int equalsIndex = stringMessage.indexOf('=', start); // Equals terminates the field name.
                         Preconditions.checkArgument(equalsIndex != -1, "Invalid structured data in syslog message '%s'", stringMessage);
                         Preconditions.checkArgument(stringMessage.charAt(equalsIndex + 1) == '"', "Invalid structured data in syslog message '%s'", stringMessage);
