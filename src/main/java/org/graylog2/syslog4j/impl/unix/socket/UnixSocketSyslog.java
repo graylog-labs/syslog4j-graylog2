@@ -43,8 +43,7 @@ public class UnixSocketSyslog extends AbstractSyslog {
 
 		@Override
 		protected List getFieldOrder() {
-			// TODO Auto-generated method stub
-			return null;
+			return Collections.emptyList();
 		}
     }
 
