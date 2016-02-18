@@ -81,10 +81,10 @@ public class UDPNetSyslogServer extends AbstractSyslogServer {
 
                 this.ds.receive(dp);
 
-                SyslogServerEventIF event = createEvent(this.getConfig(), receiveData, dp.getLength(), dp.getAddress());
-
-                handleEvent(null, this, dp, event);
-
+                if(dp.getLength() > 0) {
+                    SyslogServerEventIF event = createEvent(this.getConfig(), receiveData, dp.getLength(), dp.getAddress());
+                    handleEvent(null, this, dp, event);
+                }
             } catch (SocketException se) {
                 int i = se.getMessage() == null ? -1 : se.getMessage().toLowerCase().indexOf("socket closed");
 
