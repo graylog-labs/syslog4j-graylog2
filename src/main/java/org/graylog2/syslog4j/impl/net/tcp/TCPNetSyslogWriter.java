@@ -141,7 +141,7 @@ public class TCPNetSyslogWriter extends AbstractSyslogWriter {
                 OutputStream os = currentSocket.getOutputStream();
                 
                 String frameHeader = "";
-                if(this.tcpNetSyslogConfig.isUseFrameHeader()){
+                if(this.tcpNetSyslogConfig.isUseOctetCounting()){
                 	frameHeader = message.length + " ";
                 }
                 
@@ -152,7 +152,7 @@ public class TCPNetSyslogWriter extends AbstractSyslogWriter {
                 os.write(frameHeader.getBytes());
                 os.write(message);
 
-                if(!this.tcpNetSyslogConfig.isUseFrameHeader()) {
+                if(!this.tcpNetSyslogConfig.isUseOctetCounting()) {
                 	byte[] delimiterSequence = this.tcpNetSyslogConfig.getDelimiterSequence();
                     if (delimiterSequence != null && delimiterSequence.length > 0) {
                         os.write(delimiterSequence);
