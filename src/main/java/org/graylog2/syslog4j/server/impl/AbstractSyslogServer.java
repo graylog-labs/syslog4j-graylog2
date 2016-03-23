@@ -96,21 +96,14 @@ public abstract class AbstractSyslogServer implements SyslogServerIF {
     }
 
     protected String syslogProtocol = null;
-    protected AbstractSyslogServerConfig syslogServerConfig = null;
+    protected SyslogServerConfigIF syslogServerConfig = null;
     protected Thread thread = null;
 
     protected boolean shutdown = false;
 
     public void initialize(String protocol, SyslogServerConfigIF config) throws SyslogRuntimeException {
         this.syslogProtocol = protocol;
-
-        try {
-            this.syslogServerConfig = (AbstractSyslogServerConfig) config;
-
-        } catch (ClassCastException cce) {
-            throw new SyslogRuntimeException(cce);
-        }
-
+        this.syslogServerConfig = config;
         initialize();
     }
 
