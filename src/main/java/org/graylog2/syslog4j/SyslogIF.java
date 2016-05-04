@@ -44,6 +44,8 @@ public interface SyslogIF extends SyslogConstants {
     public void emergency(String message);
 
     public void log(int level, SyslogMessageIF message);
+    
+    public void log(int level, SyslogMessageIF message, Date datetime);
 
     public void debug(SyslogMessageIF message);
 

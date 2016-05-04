@@ -54,7 +54,7 @@ public class TCPNetSyslogConfig extends AbstractNetSyslogConfig implements TCPNe
 	 * 89 <165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog - ID47 [exampleSDID@32473]
 	 * 
 	 */
-	private boolean useFrameHeader;
+	private boolean useOctetCounting;
 
     public TCPNetSyslogConfig() {
         initialize();
@@ -161,12 +161,12 @@ public class TCPNetSyslogConfig extends AbstractNetSyslogConfig implements TCPNe
         this.freshConnectionInterval = freshConnectionInterval;
     }
     
-    public void setUseFrameHeader(boolean useFrameHeader) {
-		this.useFrameHeader = useFrameHeader;
+    public void setUseOctetCounting(boolean useOctetCounting) {
+		this.useOctetCounting = useOctetCounting;
 	}
 
-	public boolean isUseFrameHeader() {
-		return this.useFrameHeader;
+	public boolean isUseOctetCounting() {
+		return this.useOctetCounting;
 	}
 
     public Class getSyslogWriterClass() {

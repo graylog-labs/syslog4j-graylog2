@@ -178,4 +178,8 @@ public class MultipleSyslog implements SyslogIF {
 
 	}
 
+	public void log(int level, SyslogMessageIF message, Date datetime) {
+		
+	}
+
 }

@@ -149,6 +149,20 @@ public abstract class AbstractSyslog implements SyslogIF {
             log(getMessageProcessor(), level, message.createMessage());
         }
     }
+    
+    public void log(int level, SyslogMessageIF message, Date datetime) {
+        if (message instanceof StructuredSyslogMessageIF) {
+            if (getMessageProcessor() instanceof StructuredSyslogMessageProcessor) {
+                log(getMessageProcessor(), level, message.createMessage(), datetime);
+
+            } else {
+                log(getStructuredMessageProcessor(), level, message.createMessage(), datetime);
+            }
+
+        } else {
+            log(getMessageProcessor(), level, message.createMessage(), datetime);
+        }
+    }
 
     public void debug(String message) {
         log(LEVEL_DEBUG, message);
