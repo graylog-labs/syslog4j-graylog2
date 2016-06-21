@@ -50,11 +50,14 @@ package org.graylog2.syslog4j.test.message.structured;
 
 import junit.framework.TestCase;
 import org.graylog2.syslog4j.impl.message.structured.StructuredSyslogMessage;
+import org.graylog2.syslog4j.server.impl.event.SyslogServerEvent;
 import org.graylog2.syslog4j.server.impl.event.structured.StructuredSyslogServerEvent;
 import org.junit.Assert;
 
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class StructuredSyslogMessageTest extends TestCase
@@ -278,5 +281,32 @@ public class StructuredSyslogMessageTest extends TestCase
         assertEquals("TEST", message.getMessage());
         assertNull(message.getMessageId());
         assertNull(message.getStructuredData());
+    }
+
+
+    public void testMessagesIssue13() throws Exception
+    {
+        final List<String> rfc3164Events = new ArrayList<String>();
+        rfc3164Events.add("<4>Jun 20 11:59:57 xiaoleidouglas kernel: [ 357.266774] [UFW BLOCK] IN=enp9s0 OUT=enp9s0 MAC=01:2e:12:49:87:2b:01:36:1b:38:ad:80:08:50 SRC=289.15.121.109 DST=110.67.112.10 LEN=52 TOS=0x00 PREC=0x00 TTL=47 ID=43803 DF PROTO=TCP SPT=39693 DPT=23");
+        rfc3164Events.add("<30>Jun 21 00:35:33 xiaoleidouglas dhclient[7445]: bound to 289.15.121.109 -- renewal in 1189 seconds.");
+        rfc3164Events.add("<29>Jun 21 00:35:33 xiaoleidouglas dbus[775]: [system] Successfully activated service 'org.freedesktop.nm_dispatcher'");
+        rfc3164Events.add("<86>Jun 21 00:35:39 xiaoleidouglas compiz: gkr-pam: unlocked login keyring");
+
+        final List<String> rfc5424Events = new ArrayList<String>();
+        rfc5424Events.add("<4>1 2016-06-21T15:27:15.771223+08:00 xiaoleidouglas kernel - - - [ 3132.531409] [UFW BLOCK] IN=enp9s0 OUT= MAC=01:2e:12:49:87:2b:01:36:1b:38:ad:80:08:50 SRC=219.15.121.109 DST=219.15.121.109 LEN=32 TOS=0x00 PREC=0x00 TTL=1 ID=0 PROTO=2");
+        rfc5424Events.add("<30>1 2016-06-21T15:27:27.627057+08:00 xiaoleidouglas dhclient 1641 - -  DHCPREQUEST of 219.15.121.109 on wlp3s0 to 219.15.121.109 port 67 (xid=0x327a7f27)");
+        rfc5424Events.add("<6>1 2016-06-21T15:27:27.672963+08:00 xiaoleidouglas NetworkManager 810 - -  <info>  [1466494047.6728]   address 219.15.121.109");
+
+        for (String message : rfc3164Events) {
+            final SyslogServerEvent event = new SyslogServerEvent(message, InetAddress.getLocalHost());
+            assertEquals("xiaoleidouglas", event.getHost());
+        }
+
+        for (String message : rfc5424Events) {
+            final StructuredSyslogServerEvent event = new StructuredSyslogServerEvent(message, InetAddress.getLocalHost());
+            assertEquals("xiaoleidouglas", event.getHost());
+            final StructuredSyslogMessage msg = event.getStructuredMessage();
+            assertNull(msg.getStructuredData());
+        }
     }
 }
