@@ -1,5 +1,6 @@
 package org.graylog2.syslog4j.server.impl.net.udp;
 
+import org.graylog2.syslog4j.SyslogConstants;
 import org.graylog2.syslog4j.server.impl.net.AbstractNetSyslogServerConfig;
 
 /**
@@ -14,6 +15,8 @@ import org.graylog2.syslog4j.server.impl.net.AbstractNetSyslogServerConfig;
  */
 public class UDPNetSyslogServerConfig extends AbstractNetSyslogServerConfig {
     private static final long serialVersionUID = -2005919161187055486L;
+
+    private int maxMessageSize = SyslogConstants.SYSLOG_BUFFER_SIZE;
 
     public UDPNetSyslogServerConfig() {
         //
@@ -30,6 +33,20 @@ public class UDPNetSyslogServerConfig extends AbstractNetSyslogServerConfig {
     public UDPNetSyslogServerConfig(String host, int port) {
         this.host = host;
         this.port = port;
+    }
+
+    public UDPNetSyslogServerConfig(String host, int port, int maxMessageSize) {
+        this.host = host;
+        this.port = port;
+        this.maxMessageSize = maxMessageSize;
+    }
+
+    public int getMaxMessageSize() {
+        return maxMessageSize;
+    }
+
+    public void setMaxMessageSize(int maxMessageSize) {
+        this.maxMessageSize = maxMessageSize;
     }
 
     public Class getSyslogServerClass() {

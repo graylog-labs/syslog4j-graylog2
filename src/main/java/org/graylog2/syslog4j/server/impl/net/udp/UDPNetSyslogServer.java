@@ -69,7 +69,7 @@ public class UDPNetSyslogServer extends AbstractSyslogServer {
             return;
         }
 
-        byte[] receiveData = new byte[SyslogConstants.SYSLOG_BUFFER_SIZE];
+        byte[] receiveData = new byte[syslogBufferSize()];
 
         handleInitialize(this);
 
@@ -98,5 +98,12 @@ public class UDPNetSyslogServer extends AbstractSyslogServer {
         }
 
         handleDestroy(this);
+    }
+
+    private int syslogBufferSize(){
+        if (getConfig() instanceof UDPNetSyslogServerConfig){
+            return ((UDPNetSyslogServerConfig) getConfig()).getMaxMessageSize();
+        }
+        return SyslogConstants.SYSLOG_BUFFER_SIZE;
     }
 }
