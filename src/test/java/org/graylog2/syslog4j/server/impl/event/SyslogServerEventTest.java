@@ -179,4 +179,49 @@ public class SyslogServerEventTest {
         assertEquals(6, event.getLevel());
         assertEquals("hostname testmsg[20]: Test", event.getMessage());
     }
+
+    @Test
+    public void testRFC5424Timestamps() throws Exception {
+        // https://tools.ietf.org/html/rfc5424#section-6.2.3.1
+        final String example1 = "<0>1985-04-12T23:20:50.52Z hostname test[42]: Test";
+        final SyslogServerEvent event1 = buildEvent(example1);
+        assertEquals(new DateTime(1985, 4, 12, 23, 20, 50, 520, DateTimeZone.UTC).toDate(), event1.getDate());
+        assertEquals(0, event1.getFacility());
+        assertEquals("hostname", event1.getHost());
+        assertEquals(0, event1.getLevel());
+        assertEquals("hostname test[42]: Test", event1.getMessage());
+
+        final String example2 = "<0>1985-04-12T19:20:50.52-04:00 hostname test[42]: Test";
+        final SyslogServerEvent event2 = buildEvent(example2);
+        assertEquals(new DateTime(1985, 4, 12, 19, 20, 50, 520, DateTimeZone.forOffsetHours(-4)).toDate(), event2.getDate());
+        assertEquals(0, event2.getFacility());
+        assertEquals("hostname", event2.getHost());
+        assertEquals(0, event2.getLevel());
+        assertEquals("hostname test[42]: Test", event2.getMessage());
+
+        final String example3 = "<0>2003-10-11T22:14:15.003Z hostname test[42]: Test";
+        final SyslogServerEvent event3 = buildEvent(example3);
+        assertEquals(new DateTime(2003, 10, 11, 22, 14, 15, 3, DateTimeZone.UTC).toDate(), event3.getDate());
+        assertEquals(0, event3.getFacility());
+        assertEquals("hostname", event3.getHost());
+        assertEquals(0, event3.getLevel());
+        assertEquals("hostname test[42]: Test", event3.getMessage());
+
+        final String example4 = "<0>2003-08-24T05:14:15.000003-07:00 hostname test[42]: Test";
+        final SyslogServerEvent event4 = buildEvent(example4);
+        assertEquals(new DateTime(2003, 8, 24, 5, 14, 15, 0, DateTimeZone.forOffsetHours(-7)).toDate(), event4.getDate());
+        assertEquals(0, event4.getFacility());
+        assertEquals("hostname", event4.getHost());
+        assertEquals(0, event4.getLevel());
+        assertEquals("hostname test[42]: Test", event4.getMessage());
+
+        final String example5 = "<0>2003-08-24T05:14:15.000000003-07:00 hostname test[42]: Test";
+        final SyslogServerEvent event5 = buildEvent(example5);
+        // This *should* fail but the date/time parser seems to be too lenient. ;-)
+        assertEquals(new DateTime(2003, 8, 24, 5, 14, 15, 0, DateTimeZone.forOffsetHours(-7)).toDate(), event5.getDate());
+        assertEquals(0, event5.getFacility());
+        assertEquals("hostname", event5.getHost());
+        assertEquals(0, event5.getLevel());
+        assertEquals("hostname test[42]: Test", event5.getMessage());
+    }
 }
