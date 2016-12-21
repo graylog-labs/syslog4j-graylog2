@@ -1,6 +1,7 @@
 package org.graylog2.syslog4j.server.impl.event;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Test;
 
 import java.net.InetAddress;
@@ -165,4 +166,17 @@ public class SyslogServerEventTest {
         assertEquals("mymachine su[123]: 'su root' failed for lonvick on /dev/pts/8", event.getMessage());
     }
 
+    @Test
+    public void testIssue16() throws Exception {
+        // Message from: https://github.com/Graylog2/syslog4j-graylog2/issues/16
+        final String message = "<6>2016-10-12T14:10:18Z hostname testmsg[20]: Test";
+
+        final SyslogServerEvent event = buildEvent(message);
+
+        assertEquals(new DateTime(2016, 10, 12, 14, 10, 18, DateTimeZone.UTC).toDate(), event.getDate());
+        assertEquals(0, event.getFacility());
+        assertEquals("hostname", event.getHost());
+        assertEquals(6, event.getLevel());
+        assertEquals("hostname testmsg[20]: Test", event.getMessage());
+    }
 }

@@ -3,6 +3,7 @@ package org.graylog2.syslog4j.server.impl.event;
 import org.graylog2.syslog4j.SyslogConstants;
 import org.graylog2.syslog4j.server.SyslogServerEventIF;
 import org.graylog2.syslog4j.util.SyslogUtility;
+import org.joda.time.DateTime;
 
 import java.net.InetAddress;
 import java.text.DateFormat;
@@ -80,6 +81,7 @@ public class SyslogServerEvent implements SyslogServerEventIF {
     protected void parseDate() {
         int datelength = 16;
         String dateFormatS = DATE_FORMAT;
+        boolean isDate8601 = false;
 
         if (this.message.length() > datelength) {
 
@@ -89,12 +91,22 @@ public class SyslogServerEvent implements SyslogServerEventIF {
                 dateFormatS = DATE_FORMAT_S;
             }
 
-            String year = Integer.toString(Calendar.getInstance().get(Calendar.YEAR));
+            if (Character.isDigit(this.message.charAt(0))) {
+                datelength = this.message.indexOf(' ') + 1;
+                isDate8601 = true;
+            }
 
-            String originalDate = this.message.substring(0, datelength - 1) + " " + year;
+            String year = Integer.toString(Calendar.getInstance().get(Calendar.YEAR));
+            String originalDate = this.message.substring(0, datelength - 1);
+            String modifiedDate = originalDate + " " + year;
+
             DateFormat dateFormat = new SimpleDateFormat(dateFormatS, Locale.ENGLISH);
             try {
-                this.date = dateFormat.parse(originalDate);
+                if (!isDate8601) {
+                    this.date = dateFormat.parse(modifiedDate);
+                } else {
+                    this.date = DateTime.parse(originalDate).toDate();
+                }
 
                 this.message = this.message.substring(datelength);
 
