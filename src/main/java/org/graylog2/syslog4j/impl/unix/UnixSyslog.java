@@ -37,6 +37,8 @@ public class UnixSyslog extends AbstractSyslog {
         public void closelog();
     }
 
+    protected static Memory identBuffer = null;
+
     protected static int currentFacility = -1;
     protected static boolean openlogCalled = false;
 
@@ -80,8 +82,6 @@ public class UnixSyslog extends AbstractSyslog {
                 if (ident != null && "".equals(ident.trim())) {
                     ident = null;
                 }
-
-                Memory identBuffer = null;
 
                 if (ident != null) {
                     identBuffer = new Memory(128);
