@@ -1,6 +1,7 @@
 package org.graylog2.syslog4j.impl.unix.socket;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -42,10 +43,10 @@ public class UnixSocketSyslog extends AbstractSyslog {
             System.arraycopy(ZERO_BYTE, 0, this.sun_path, sunPath.length(), 1);
         }
 
-		@Override
-		protected List getFieldOrder() {
-			return Collections.emptyList();
-		}
+        @Override
+        protected List<String> getFieldOrder() {
+            return Arrays.asList(new String[] {"sun_family", "sun_path"});
+        }
     }
 
     protected interface CLibrary extends Library {
