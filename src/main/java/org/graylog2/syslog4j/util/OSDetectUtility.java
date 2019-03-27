@@ -24,7 +24,7 @@ public final class OSDetectUtility {
             "FreeBSD",
             "Irix",
             "Digital Unix",
-            "FreeBSD",
+            "OpenBSD",
             "OSF1",
             "OpenVMS"
     };
