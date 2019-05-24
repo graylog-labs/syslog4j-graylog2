@@ -100,9 +100,9 @@ public class SyslogServerEvent implements SyslogServerEventIF {
             String originalDate = this.message.substring(0, datelength - 1);
             String modifiedDate = originalDate + " " + year;
 
-            DateFormat dateFormat = new SimpleDateFormat(dateFormatS, Locale.ENGLISH);
             try {
                 if (!isDate8601) {
+                    DateFormat dateFormat = new SimpleDateFormat(dateFormatS, Locale.ENGLISH);
                     this.date = dateFormat.parse(modifiedDate);
                 } else {
                     this.date = DateTime.parse(originalDate).toDate();
@@ -110,7 +110,7 @@ public class SyslogServerEvent implements SyslogServerEventIF {
 
                 this.message = this.message.substring(datelength);
 
-            } catch (ParseException pe) {
+            } catch (ParseException | IllegalArgumentException ex) {
                 this.date = new Date();
             }
         }
