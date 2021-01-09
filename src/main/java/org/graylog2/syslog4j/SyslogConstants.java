@@ -69,6 +69,12 @@ public interface SyslogConstants extends Serializable {
     public static final boolean TCP_SO_LINGER_DEFAULT = true;
     public static final int TCP_SO_LINGER_SECONDS_DEFAULT = 1;
     public static final boolean TCP_KEEP_ALIVE_DEFAULT = true;
+    public static final boolean TCP_KEEP_ALIVE_COUNT_DEFAULT = true;
+    public static final int TCP_KEEP_ALIVE_COUNT_VALUE_DEFAULT = 8;
+    public static final boolean TCP_KEEP_ALIVE_INTERVAL_DEFAULT = true;
+    public static final int TCP_KEEP_ALIVE_INTERVAL_SECONDS_DEFAULT = 75;
+    public static final boolean TCP_KEEP_ALIVE_IDLE_DEFAULT = true;
+    public static final int TCP_KEEP_ALIVE_IDLE_SECONDS_DEFAULT = 1200;
     public static final boolean TCP_REUSE_ADDRESS_DEFAULT = true;
     public static final boolean TCP_SET_BUFFER_SIZE_DEFAULT = true;
     public static final int TCP_FRESH_CONNECTION_INTERVAL_DEFAULT = -1;

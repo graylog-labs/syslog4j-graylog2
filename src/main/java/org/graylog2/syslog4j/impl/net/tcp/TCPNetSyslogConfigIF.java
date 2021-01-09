@@ -34,6 +34,24 @@ public interface TCPNetSyslogConfigIF extends AbstractNetSyslogConfigIF {
 
     public void setKeepAlive(boolean keepAlive);
 
+    public boolean isKeepAliveCount();
+
+    public void setKeepAliveCountValue(int countValue);
+
+    public int getKeepAliveCountValue();
+
+    public boolean isKeepAliveInterval();
+
+    public void setKeepAliveIntervalSeconds(int intervalSeconds);
+
+    public int getKeepAliveIntervalSeconds();
+
+    public boolean isKeepAliveIdle();
+
+    public void setKeepAliveIdleSeconds(int idleSeconds);
+
+    public int getKeepAliveIdleSeconds();
+
     public boolean isReuseAddress();
 
     public void setReuseAddress(boolean reuseAddress);

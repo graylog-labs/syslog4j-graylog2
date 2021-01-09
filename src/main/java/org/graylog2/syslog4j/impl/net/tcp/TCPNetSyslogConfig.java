@@ -39,6 +39,13 @@ public class TCPNetSyslogConfig extends AbstractNetSyslogConfig implements TCPNe
 
     protected boolean keepAlive = TCP_KEEP_ALIVE_DEFAULT;
 
+    protected boolean keepAliveCount = TCP_KEEP_ALIVE_COUNT_DEFAULT;
+    protected int keepAliveCountValue = TCP_KEEP_ALIVE_COUNT_VALUE_DEFAULT;
+    protected boolean keepAliveInterval = TCP_KEEP_ALIVE_INTERVAL_DEFAULT;
+    protected int keepAliveIntervalSeconds = TCP_KEEP_ALIVE_INTERVAL_SECONDS_DEFAULT;
+    protected boolean keepAliveIdle = TCP_KEEP_ALIVE_IDLE_DEFAULT;
+    protected int keepAliveIdleSeconds = TCP_KEEP_ALIVE_IDLE_SECONDS_DEFAULT;
+
     protected boolean reuseAddress = TCP_REUSE_ADDRESS_DEFAULT;
 
     protected boolean setBufferSize = TCP_SET_BUFFER_SIZE_DEFAULT;
@@ -135,6 +142,51 @@ public class TCPNetSyslogConfig extends AbstractNetSyslogConfig implements TCPNe
 
     public void setKeepAlive(boolean keepAlive) {
         this.keepAlive = keepAlive;
+    }
+
+    @Override
+    public boolean isKeepAliveCount() {
+        return this.keepAliveCount;
+    }
+
+    @Override
+    public void setKeepAliveCountValue(int countValue) {
+        this.keepAliveCountValue = countValue;
+    }
+
+    @Override
+    public int getKeepAliveCountValue() {
+        return this.keepAliveCountValue;
+    }
+
+    @Override
+    public boolean isKeepAliveInterval() {
+        return this.keepAliveInterval;
+    }
+
+    @Override
+    public void setKeepAliveIntervalSeconds(int intervalSeconds) {
+        this.keepAliveIntervalSeconds = intervalSeconds;
+    }
+
+    @Override
+    public int getKeepAliveIntervalSeconds() {
+        return this.keepAliveIntervalSeconds;
+    }
+
+    @Override
+    public boolean isKeepAliveIdle() {
+        return this.keepAliveIdle;
+    }
+
+    @Override
+    public void setKeepAliveIdleSeconds(int idleSeconds) {
+        this.keepAliveIdleSeconds = idleSeconds;
+    }
+
+    @Override
+    public int getKeepAliveIdleSeconds() {
+        return this.keepAliveIdleSeconds;
     }
 
     public boolean isReuseAddress() {
