@@ -65,7 +65,7 @@ public abstract class AbstractSyslogMessageProcessor implements SyslogMessagePro
     }
 
     protected void appendPriority(StringBuffer buffer, int facility, int level) {
-        int priority = facility | level;
+        int priority = (facility << 3 ) | level;
 
         buffer.append("<");
         buffer.append(priority);

@@ -1,5 +1,7 @@
 package org.graylog2.syslog4j.server.impl.event;
 
+import org.graylog2.syslog4j.SyslogConstants;
+import org.graylog2.syslog4j.util.SyslogUtility;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
@@ -223,5 +225,20 @@ public class SyslogServerEventTest {
         assertEquals("hostname", event5.getHost());
         assertEquals(0, event5.getLevel());
         assertEquals("hostname test[42]: Test", event5.getMessage());
+    }
+
+    @Test
+    public void testFacilityConversion() throws Exception {
+        // as per RFC-5424
+        assertEquals(20, SyslogConstants.FACILITY_LOCAL4);
+        assertEquals(6, SyslogConstants.LEVEL_INFO);
+        assertEquals("local4", SyslogUtility.getFacilityString(SyslogConstants.FACILITY_LOCAL4));
+
+        // 20*8 + 6 = 166
+        final String message = "<166>2016-10-12T14:10:18Z hostname testmsg[20]: Test";
+        final SyslogServerEvent event = buildEvent(message);
+
+        assertEquals(SyslogConstants.FACILITY_LOCAL4, event.facility);
+        assertEquals(SyslogConstants.LEVEL_INFO, event.level);
     }
 }

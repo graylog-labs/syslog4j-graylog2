@@ -92,7 +92,7 @@ public class UnixSyslog extends AbstractSyslog {
                 openlogCalled = true;
             }
 
-            int priority = currentFacility | level;
+            int priority = (currentFacility << 3) | level;
 
             libraryInstance.syslog(priority, "%s", message);
         }
