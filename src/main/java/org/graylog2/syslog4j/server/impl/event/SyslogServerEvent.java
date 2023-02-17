@@ -4,6 +4,8 @@ import org.graylog2.syslog4j.SyslogConstants;
 import org.graylog2.syslog4j.server.SyslogServerEventIF;
 import org.graylog2.syslog4j.util.SyslogUtility;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.ISODateTimeFormat;
 
 import java.net.InetAddress;
 import java.text.DateFormat;
@@ -12,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * SyslogServerEvent provides an implementation of the SyslogServerEventIF interface.
@@ -40,18 +43,31 @@ public class SyslogServerEvent implements SyslogServerEventIF {
     protected boolean isHostStrippedFromMessage = false;
     protected String message = null;
     protected InetAddress inetAddress = null;
+    protected DateTimeZone sysLogServerTimeZone;
 
     protected SyslogServerEvent() {
     }
 
     public SyslogServerEvent(final String message, InetAddress inetAddress) {
-        initialize(message, inetAddress);
+        initialize(message, inetAddress, null);
+
+        parse();
+    }
+
+    public SyslogServerEvent(final String message, InetAddress inetAddress, DateTimeZone sysLogServerTimeZone) {
+        initialize(message, inetAddress, sysLogServerTimeZone);
 
         parse();
     }
 
     public SyslogServerEvent(final byte[] message, int length, InetAddress inetAddress) {
         initialize(message, length, inetAddress);
+
+        parse();
+    }
+
+    public SyslogServerEvent(final byte[] message, int length, InetAddress inetAddress, DateTimeZone sysLogServerTimeZone) {
+        initialize(message, length, inetAddress, sysLogServerTimeZone);
 
         parse();
     }
@@ -64,10 +80,20 @@ public class SyslogServerEvent implements SyslogServerEventIF {
         this.message = message;
     }
 
+    protected void initialize(final String message, InetAddress inetAddress, DateTimeZone sysLogServerTimeZone) {
+        this.sysLogServerTimeZone = sysLogServerTimeZone;
+        initialize(message, inetAddress);
+    }
+
     protected void initialize(final byte[] message, int length, InetAddress inetAddress) {
         this.rawBytes = message;
         this.rawLength = length;
         this.inetAddress = inetAddress;
+    }
+
+    protected void initialize(final byte[] message, int length, InetAddress inetAddress, DateTimeZone sysLogServerTimeZone) {
+        this.sysLogServerTimeZone = sysLogServerTimeZone;
+        initialize(message, length, inetAddress);
     }
 
     protected void parseHost() {
@@ -96,16 +122,13 @@ public class SyslogServerEvent implements SyslogServerEventIF {
                 isDate8601 = true;
             }
 
-            String year = Integer.toString(Calendar.getInstance().get(Calendar.YEAR));
             String originalDate = this.message.substring(0, datelength - 1);
-            String modifiedDate = originalDate + " " + year;
 
-            DateFormat dateFormat = new SimpleDateFormat(dateFormatS, Locale.ENGLISH);
             try {
                 if (!isDate8601) {
-                    this.date = dateFormat.parse(modifiedDate);
+                    this.date = parseDateBasedOnFormat(originalDate, datelength, dateFormatS);
                 } else {
-                    this.date = DateTime.parse(originalDate).toDate();
+                    this.date = parse8601Date(originalDate).toDate();
                 }
 
                 this.message = this.message.substring(datelength);
@@ -116,6 +139,28 @@ public class SyslogServerEvent implements SyslogServerEventIF {
         }
 
         parseHost();
+    }
+
+    private Date parseDateBasedOnFormat(String originalDate, int dateLength, String format) throws ParseException {
+        String year = Integer.toString(Calendar.getInstance().get(Calendar.YEAR));
+        String modifiedDate = originalDate + " " + year;
+        DateFormat dateFormat = new SimpleDateFormat(format, Locale.ENGLISH);
+
+        if (Objects.nonNull(sysLogServerTimeZone)) {
+            dateFormat.setTimeZone(sysLogServerTimeZone.toTimeZone());
+        }
+
+        return dateFormat.parse(modifiedDate);
+    }
+
+    private DateTime parse8601Date(String date) {
+        boolean hasTimezone = date.substring(date.length() - 6).matches(".*[Z+-].*");
+
+        if (!hasTimezone && Objects.nonNull(sysLogServerTimeZone)) {
+            return DateTime.parse(date, ISODateTimeFormat.dateTimeParser().withZone(sysLogServerTimeZone));
+        }
+
+        return DateTime.parse(date);
     }
 
     protected void parsePriority() {

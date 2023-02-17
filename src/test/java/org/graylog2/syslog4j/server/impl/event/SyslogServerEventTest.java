@@ -2,15 +2,20 @@ package org.graylog2.syslog4j.server.impl.event;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDateTime;
 import org.junit.Test;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class SyslogServerEventTest {
     private final InetAddress INET_ADDR = new InetSocketAddress(514).getAddress();
+    private final DateTimeZone mstZone = DateTimeZone.forID("MST");
+    private final DateTimeZone cet = DateTimeZone.forID("CET");
 
     private SyslogServerEvent buildEvent(String message) {
         return new SyslogServerEvent(message, INET_ADDR);
@@ -185,6 +190,7 @@ public class SyslogServerEventTest {
         // https://tools.ietf.org/html/rfc5424#section-6.2.3.1
         final String example1 = "<0>1985-04-12T23:20:50.52Z hostname test[42]: Test";
         final SyslogServerEvent event1 = buildEvent(example1);
+
         assertEquals(new DateTime(1985, 4, 12, 23, 20, 50, 520, DateTimeZone.UTC).toDate(), event1.getDate());
         assertEquals(0, event1.getFacility());
         assertEquals("hostname", event1.getHost());
@@ -223,5 +229,41 @@ public class SyslogServerEventTest {
         assertEquals("hostname", event5.getHost());
         assertEquals(0, event5.getLevel());
         assertEquals("hostname test[42]: Test", event5.getMessage());
+    }
+
+    @Test
+    public void testDefaultTimeZoneForRFC5424() {
+        final String withUtcOffset = "<0>1985-04-12T23:20:50.52Z hostname test[42]: Test";
+        DateTime utcDateTime = new DateTime(1985, 4, 12, 23, 20, 50, 520, DateTimeZone.UTC);
+
+        assertEquals(utcDateTime.toDate(), new SyslogServerEvent(withUtcOffset, INET_ADDR).getDate());
+        assertEquals(utcDateTime.toDate(), new SyslogServerEvent(withUtcOffset.getBytes(), withUtcOffset.length(), INET_ADDR).getDate());
+
+        final String withMstOffset = "<0>1985-04-12T23:20:50.52-07:00 hostname test[42]: Test";
+        DateTime cetDateTime = new DateTime(1985, 4, 12, 23, 20, 50, 520, cet);
+        DateTime mstDateTime = new DateTime(1985, 4, 12, 23, 20, 50, 520, mstZone);
+        SyslogServerEvent syslogServerEventMstWithDefaultCet = new SyslogServerEvent(withMstOffset, INET_ADDR, cet);
+
+        assertEquals(mstDateTime.toDate(), new SyslogServerEvent(withMstOffset, INET_ADDR).getDate());
+        assertEquals(mstDateTime.toDate(), syslogServerEventMstWithDefaultCet.getDate());
+        assertNotEquals(cetDateTime.toDate(), syslogServerEventMstWithDefaultCet.getDate());
+
+        final String withoutOffset = "<0>1985-04-12T23:20:50.52 hostname test[42]: Test";
+        SyslogServerEvent syslogServerEventCet = new SyslogServerEvent(withoutOffset, INET_ADDR, cet);
+
+        assertEquals(cetDateTime.toDate(), syslogServerEventCet.getDate());
+        assertNotEquals(mstDateTime.toDate(), syslogServerEventCet.getDate());
+        assertEquals(mstDateTime.toDate(), new SyslogServerEvent(withoutOffset, INET_ADDR, mstZone).getDate());
+    }
+
+    @Test
+    public void testDefaultTimeZones() {
+        final String message = "<34>Oct 11 17:14:15 mymachine su: 'su root' failed for lonvick on /dev/pts/8";
+        final SyslogServerEvent testWithDefaultConf = new SyslogServerEvent(message, INET_ADDR, mstZone);
+        final SyslogServerEvent test = new SyslogServerEvent(message, INET_ADDR);
+
+        assertEquals(new DateTime(new DateTime().getYear() + "-10-11T17:14:15", mstZone).toDate(), testWithDefaultConf.getDate());
+        assertEquals(new DateTime(new DateTime().getYear() + "-10-11T17:14:15").toDate(), test.getDate());
+
     }
 }
