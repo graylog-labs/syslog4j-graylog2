@@ -1,12 +1,16 @@
 package org.graylog2.syslog4j.server.impl.event;
 
+import org.joda.time.DateTimeZone;
 import org.junit.Test;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.Locale;
 
 import static java.time.ZoneOffset.UTC;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -14,6 +18,8 @@ import static org.junit.Assert.assertEquals;
 
 
 public class CiscoSyslogServerEventTest {
+    public static final DateTimeZone MST = DateTimeZone.forID("MST");
+    public static final ZoneId MST_ZONE_ID = MST.toTimeZone().toZoneId();
     private static final InetAddress INET_ADDR = new InetSocketAddress(514).getAddress();
     private static final ZoneId CET = ZoneId.of("CET");
     private static final int YEAR = ZonedDateTime.now().getYear();
@@ -120,6 +126,31 @@ public class CiscoSyslogServerEventTest {
         assertThat(event.getSequenceNumber()).isEqualTo(0);
         assertThat(event.getHost()).isEmpty();
         assertThat(event.getMessage()).isEqualTo("%ASA-6-302015: Built inbound UDP connection 23631055 for inside:192.168.19.91/44764 (192.168.19.91/44764) to identity:192.168.249.33/161 (192.168.249.33/161)");
+    }
+
+    @Test
+    public void testDefaultTimeZoneUtcIfNotConfigured() throws Exception {
+        final String message = "<190>: 2016 Mar 06 09:22:34: %AUTHPRIV-6-SYSTEM_MSG: START: rsync pid=4311 from=::ffff:IP - xinetd[6219]";
+        final CiscoSyslogServerEvent event = buildEvent(message);
+
+        assertThat(toZonedDateTime(event.getDate(), UTC)).isEqualTo(ZonedDateTime.of(2016, 3, 6, 9, 22, 34, 0, UTC));
+    }
+
+    @Test
+    public void testDefaultTimeZoneConfigured() throws Exception {
+        final String message = "<190>: 2016 Mar 06 09:22:34: %AUTHPRIV-6-SYSTEM_MSG: START: rsync pid=4311 from=::ffff:IP - xinetd[6219]";
+        final CiscoSyslogServerEvent event = new CiscoSyslogServerEvent(message, INET_ADDR, MST);
+
+        assertThat(toZonedDateTime(event.getDate(), MST_ZONE_ID)).isEqualTo(ZonedDateTime.of(2016, 3, 6, 9, 22, 34, 0, MST_ZONE_ID));
+    }
+
+    @Test
+    public void testDefaultTimeZoneIgnoredSinceZoneDetected() throws Exception {
+        final String message = "<190>: 2016 Mar 06 09:22:34 CET: %AUTHPRIV-6-SYSTEM_MSG: START: rsync pid=4311 from=::ffff:IP - xinetd[6219]";
+        DateTimeZone mst = DateTimeZone.forID("MST");
+        final CiscoSyslogServerEvent event = new CiscoSyslogServerEvent(message, INET_ADDR, mst);
+
+        assertThat(toZonedDateTime(event.getDate(), CET)).isEqualTo(ZonedDateTime.of(2016, 3, 6, 9, 22, 34, 0, CET));
     }
 
     private ZonedDateTime toZonedDateTime(Date date, ZoneId zoneId) {
