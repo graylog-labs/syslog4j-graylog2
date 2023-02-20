@@ -148,13 +148,16 @@ public class SyslogServerEvent implements SyslogServerEventIF {
     }
 
     private DateTime parse8601Date(String date) {
-        boolean hasTimezone = date.substring(date.length() - 6).matches(".*[Z+-].*");
 
-        if (!hasTimezone && Objects.nonNull(sysLogServerTimeZone)) {
+        if (!hasTimeZone(date) && Objects.nonNull(sysLogServerTimeZone)) {
             return DateTime.parse(date, ISODateTimeFormat.dateTimeParser().withZone(sysLogServerTimeZone));
         }
 
         return DateTime.parse(date);
+    }
+
+    protected boolean hasTimeZone(String date) {
+        return date.substring(date.length() - 6).matches(".*[Z+-].*");
     }
 
     protected void parsePriority() {

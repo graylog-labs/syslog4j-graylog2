@@ -1,10 +1,14 @@
 package org.graylog2.syslog4j.server.impl.event.structured;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Test;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,6 +16,7 @@ import static org.junit.Assert.assertEquals;
 
 
 public class StructuredSyslogServerEventTest {
+    public static final DateTimeZone MST = DateTimeZone.forID("MST");
     private final InetAddress INET_ADDR = new InetSocketAddress(514).getAddress();
 
     private StructuredSyslogServerEvent buildEvent(String message) {
@@ -222,5 +227,25 @@ public class StructuredSyslogServerEventTest {
         assertEquals(structuredData, event.getStructuredMessage().getStructuredData());
         assertEquals(null, event.getStructuredMessage().getMessageId());
         assertEquals("syslog-ng starting up; version='3.5.3'", event.getStructuredMessage().getMessage());
+    }
+
+    @Test
+    public void testDefaultTimeZoneNotSet() throws Exception {
+        // Message from: https://github.com/Graylog2/graylog2-server/issues/845
+        final String messageWithoutZone = "<45>1 2014-10-21T10:21:09 c4dc57ba1ebb syslog-ng 7120 - [meta sequenceId=\"1\"] syslog-ng starting up; version='3.5.3'";
+        final String messageWithZone = "<45>1 2014-10-21T10:21:09-07:00 c4dc57ba1ebb syslog-ng 7120 - [meta sequenceId=\"1\"] syslog-ng starting up; version='3.5.3'";
+
+        assertEquals(new DateTime("2014-10-21T10:21:09.000"), buildEvent(messageWithoutZone).getDateTime());
+        assertEquals(new DateTime("2014-10-21T10:21:09.000-07:00"), buildEvent(messageWithZone).getDateTime());
+    }
+
+    @Test
+    public void testDefaultTimeZoneSet() throws Exception {
+        // Message from: https://github.com/Graylog2/graylog2-server/issues/845
+        final String messageWithoutZone = "<45>1 2014-10-21T10:21:09 c4dc57ba1ebb syslog-ng 7120 - [meta sequenceId=\"1\"] syslog-ng starting up; version='3.5.3'";
+        final String messageWithZone = "<45>1 2014-10-21T10:21:09+01:00 c4dc57ba1ebb syslog-ng 7120 - [meta sequenceId=\"1\"] syslog-ng starting up; version='3.5.3'";
+        ZonedDateTime of = ZonedDateTime.of(2014, 10, 21, 10, 21, 9, 0, MST.toTimeZone().toZoneId());
+        assertEquals(new DateTime("2014-10-21T10:21:09.000-07:00", MST), new StructuredSyslogServerEvent(messageWithoutZone, INET_ADDR, MST).getDateTime());
+        assertEquals(new DateTime("2014-10-21T10:21:09.000+01:00"), new StructuredSyslogServerEvent(messageWithZone, INET_ADDR, MST).getDateTime());
     }
 }

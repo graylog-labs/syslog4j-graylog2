@@ -4,11 +4,13 @@ import org.graylog2.syslog4j.SyslogConstants;
 import org.graylog2.syslog4j.impl.message.structured.StructuredSyslogMessage;
 import org.graylog2.syslog4j.server.impl.event.SyslogServerEvent;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
 import java.net.InetAddress;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * SyslogServerStructuredEvent provides an implementation of the
@@ -43,10 +45,23 @@ public class StructuredSyslogServerEvent extends SyslogServerEvent {
         parse();
     }
 
+    public StructuredSyslogServerEvent(final byte[] message, int length, InetAddress inetAddres, DateTimeZone sysLogServerTimeZone) {
+        super();
+
+        initialize(message, length, inetAddress, sysLogServerTimeZone);
+        parse();
+    }
+
     public StructuredSyslogServerEvent(final String message, InetAddress inetAddress) {
         super();
 
         initialize(message, inetAddress, null);
+        parse();
+    }
+    public StructuredSyslogServerEvent(final String message, InetAddress inetAddress, DateTimeZone sysLogServerTimeZone) {
+        super();
+
+        initialize(message, inetAddress, sysLogServerTimeZone);
         parse();
     }
 
@@ -102,6 +117,10 @@ public class StructuredSyslogServerEvent extends SyslogServerEvent {
 
             try {
                 DateTimeFormatter formatter = getDateTimeFormatter();
+
+                if (!hasTimeZone(dateString) && Objects.nonNull(sysLogServerTimeZone)) {
+                    formatter = formatter.withZone(sysLogServerTimeZone);
+                }
 
                 this.dateTime = formatter.parseDateTime(dateString);
                 this.date = this.dateTime.toDate();
