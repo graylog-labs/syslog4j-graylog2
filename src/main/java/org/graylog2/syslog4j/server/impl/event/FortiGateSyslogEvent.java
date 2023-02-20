@@ -1,11 +1,13 @@
 package org.graylog2.syslog4j.server.impl.event;
 
 import org.graylog2.syslog4j.server.SyslogServerEventIF;
+import org.joda.time.DateTimeZone;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -13,6 +15,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,7 +33,8 @@ public class FortiGateSyslogEvent implements SyslogServerEventIF {
     private static final Pattern KV_PATTERN = Pattern.compile("(\\w+)=([^\\s\"]*)");
     private static final Pattern QUOTED_KV_PATTERN = Pattern.compile("(\\w+)=\"([^\"]*)\"");
 
-    private final String rawEvent;
+    private String rawEvent;
+    private ZoneId defaultZoneId;
     private Date date;
     private int facility;
     private int level;
@@ -40,7 +44,16 @@ public class FortiGateSyslogEvent implements SyslogServerEventIF {
     private Map<String, String> fields = Collections.emptyMap();
 
     public FortiGateSyslogEvent(final String rawEvent) {
+        initialize(rawEvent, null);
+    }
+
+    public FortiGateSyslogEvent(final String rawEvent, DateTimeZone sysLogServerTimeZone) {
+        initialize(rawEvent, sysLogServerTimeZone);
+    }
+
+    private void initialize(final String rawEvent, DateTimeZone sysLogServerTimeZone) {
         this.rawEvent = requireNonNull(rawEvent, "rawEvent");
+        this.defaultZoneId = Objects.isNull(sysLogServerTimeZone) ? ZoneOffset.UTC : sysLogServerTimeZone.toTimeZone().toZoneId();
         parse(rawEvent);
     }
 
@@ -55,7 +68,7 @@ public class FortiGateSyslogEvent implements SyslogServerEventIF {
             parsePriority(priority);
             setMessage(message);
             parseFields(message);
-            parseDate(fields.get("date"), fields.get("time"));
+            parseDate(fields.get("date"), fields.get("time"), fields.get("tz"));
             setHost(fields.get("devname"));
         }
     }
@@ -83,12 +96,18 @@ public class FortiGateSyslogEvent implements SyslogServerEventIF {
         setFields(fields);
     }
 
-    private void parseDate(String date, String time) {
+    private void parseDate(String date, String time, String timeZone) {
         if (date != null && time != null) {
+            ZoneId zone = defaultZoneId;
+
+            if (timeZone != null) {
+              zone =   ZoneOffset.of(timeZone);
+            }
+
             final ZonedDateTime dateTime = ZonedDateTime.of(
-                    LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE.withZone(ZoneOffset.UTC)),
-                    LocalTime.parse(time, DateTimeFormatter.ISO_LOCAL_TIME.withZone(ZoneOffset.UTC)),
-                    ZoneOffset.UTC);
+                    LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE.withZone(zone)),
+                    LocalTime.parse(time, DateTimeFormatter.ISO_LOCAL_TIME.withZone(zone)),
+                    zone);
             setDate(Date.from(dateTime.toInstant()));
 
         } else {

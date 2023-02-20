@@ -29,7 +29,7 @@ public class CiscoSyslogServerEvent extends SyslogServerEvent {
     public CiscoSyslogServerEvent(final byte[] message, int length, InetAddress inetAddress) {
         super();
 
-        initialize(message, length, inetAddress);
+        initialize(message, length, inetAddress, null);
         parse();
     }
     public CiscoSyslogServerEvent(final byte[] message, int length, InetAddress inetAddress, DateTimeZone sysLogServerTimeZone) {
@@ -42,7 +42,7 @@ public class CiscoSyslogServerEvent extends SyslogServerEvent {
     public CiscoSyslogServerEvent(final String message, InetAddress inetAddress) {
         super();
 
-        initialize(message, inetAddress);
+        initialize(message, inetAddress, null);
         parse();
     }
 
@@ -171,7 +171,4 @@ public class CiscoSyslogServerEvent extends SyslogServerEvent {
         return sequenceNumber;
     }
 
-    private ZoneId getDefaultServerZoneId() {
-        return Objects.isNull(sysLogServerTimeZone) ? ZoneOffset.UTC : sysLogServerTimeZone.toTimeZone().toZoneId();
-    }
 }

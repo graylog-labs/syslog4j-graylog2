@@ -39,14 +39,14 @@ public class StructuredSyslogServerEvent extends SyslogServerEvent {
     public StructuredSyslogServerEvent(final byte[] message, int length, InetAddress inetAddress) {
         super();
 
-        initialize(message, length, inetAddress);
+        initialize(message, length, inetAddress, null);
         parse();
     }
 
     public StructuredSyslogServerEvent(final String message, InetAddress inetAddress) {
         super();
 
-        initialize(message, inetAddress);
+        initialize(message, inetAddress, null);
         parse();
     }
 

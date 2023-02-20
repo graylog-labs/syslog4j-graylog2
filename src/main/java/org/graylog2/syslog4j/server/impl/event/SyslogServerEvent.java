@@ -11,6 +11,8 @@ import java.net.InetAddress;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -61,7 +63,7 @@ public class SyslogServerEvent implements SyslogServerEventIF {
     }
 
     public SyslogServerEvent(final byte[] message, int length, InetAddress inetAddress) {
-        initialize(message, length, inetAddress);
+        initialize(message, length, inetAddress, null);
 
         parse();
     }
@@ -72,28 +74,20 @@ public class SyslogServerEvent implements SyslogServerEventIF {
         parse();
     }
 
-    protected void initialize(final String message, InetAddress inetAddress) {
+    protected void initialize(final String message, InetAddress inetAddress, DateTimeZone sysLogServerTimeZone) {
         this.rawString = message;
         this.rawLength = message.length();
         this.inetAddress = inetAddress;
-
         this.message = message;
-    }
-
-    protected void initialize(final String message, InetAddress inetAddress, DateTimeZone sysLogServerTimeZone) {
         this.sysLogServerTimeZone = sysLogServerTimeZone;
-        initialize(message, inetAddress);
     }
 
-    protected void initialize(final byte[] message, int length, InetAddress inetAddress) {
+
+    protected void initialize(final byte[] message, int length, InetAddress inetAddress, DateTimeZone sysLogServerTimeZone) {
         this.rawBytes = message;
         this.rawLength = length;
         this.inetAddress = inetAddress;
-    }
-
-    protected void initialize(final byte[] message, int length, InetAddress inetAddress, DateTimeZone sysLogServerTimeZone) {
         this.sysLogServerTimeZone = sysLogServerTimeZone;
-        initialize(message, length, inetAddress);
     }
 
     protected void parseHost() {
@@ -220,6 +214,10 @@ public class SyslogServerEvent implements SyslogServerEventIF {
 
             return newRawBytes;
         }
+    }
+
+    protected ZoneId getDefaultServerZoneId() {
+        return Objects.isNull(sysLogServerTimeZone) ? ZoneOffset.UTC : sysLogServerTimeZone.toTimeZone().toZoneId();
     }
 
     public int getRawLength() {
