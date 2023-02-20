@@ -3,15 +3,12 @@ package org.graylog2.syslog4j.server.impl.event;
 import org.joda.time.DateTimeZone;
 
 import java.net.InetAddress;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Objects;
 
 /**
  * CiscoSyslogServerEvent provides an implementation of the
