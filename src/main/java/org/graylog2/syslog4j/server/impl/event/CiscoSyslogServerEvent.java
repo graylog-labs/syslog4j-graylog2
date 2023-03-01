@@ -1,7 +1,8 @@
 package org.graylog2.syslog4j.server.impl.event;
 
+import org.joda.time.DateTimeZone;
+
 import java.net.InetAddress;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -19,21 +20,33 @@ import java.util.Locale;
 public class CiscoSyslogServerEvent extends SyslogServerEvent {
     private static final DateTimeFormatter DEFAULT_FORMATTER =
             DateTimeFormatter
-                    .ofPattern("yyyy MMM ppd HH:mm:ss[.SSS][ zzz]", Locale.ROOT)
-                    .withZone(ZoneOffset.UTC);
+                    .ofPattern("yyyy MMM ppd HH:mm:ss[.SSS][ zzz]", Locale.ROOT);
     private int sequenceNumber = 0;
 
     public CiscoSyslogServerEvent(final byte[] message, int length, InetAddress inetAddress) {
         super();
 
-        initialize(message, length, inetAddress);
+        initialize(message, length, inetAddress, null);
+        parse();
+    }
+    public CiscoSyslogServerEvent(final byte[] message, int length, InetAddress inetAddress, DateTimeZone sysLogServerTimeZone) {
+        super();
+
+        initialize(message, length, inetAddress, sysLogServerTimeZone);
         parse();
     }
 
     public CiscoSyslogServerEvent(final String message, InetAddress inetAddress) {
         super();
 
-        initialize(message, inetAddress);
+        initialize(message, inetAddress, null);
+        parse();
+    }
+
+    public CiscoSyslogServerEvent(final String message, InetAddress inetAddress, DateTimeZone sysLogServerTimeZone) {
+        super();
+
+        initialize(message, inetAddress, sysLogServerTimeZone);
         parse();
     }
 
@@ -117,7 +130,7 @@ public class CiscoSyslogServerEvent extends SyslogServerEvent {
         if (this.message.length() > dateLength) {
             boolean isYearMissing = Character.isLetter(message.charAt(0));
             String originalDate = this.message.substring(0, dateLength);
-            DateTimeFormatter formatter = DEFAULT_FORMATTER;
+            DateTimeFormatter formatter = DEFAULT_FORMATTER.withZone(getDefaultServerZoneId());
 
             // Hacky override for: "Mar 06 2016 12:53:10 DEVICENAME :"
             if (Character.isDigit(message.charAt(7))
@@ -129,7 +142,7 @@ public class CiscoSyslogServerEvent extends SyslogServerEvent {
                 originalDate = this.message.substring(0, dateLength);
                 formatter = DateTimeFormatter
                         .ofPattern("MMM ppd yyyy HH:mm:ss", Locale.ROOT)
-                        .withZone(ZoneOffset.UTC);
+                        .withZone(getDefaultServerZoneId());
             }
 
             try {
@@ -154,4 +167,5 @@ public class CiscoSyslogServerEvent extends SyslogServerEvent {
     public int getSequenceNumber() {
         return sequenceNumber;
     }
+
 }
