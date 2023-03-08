@@ -33,5 +33,6 @@ jobs:
           SIGN_KEY_PASS = ${{ secrets.SIGN_KEY_PASS }}
         run: |
           mvn \
+          -P release \
           -DsonatypeOssDistMgmtSnapshotsUrl=${{ secrets.SONATYPE_OSS_DIST_MGMT_SNAPSHOTS_URL }} \
           clean deploy
