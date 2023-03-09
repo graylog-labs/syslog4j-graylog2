@@ -1,38 +1,40 @@
 name: Release maven package
 on:
   workflow_dispatch:
-    inputs:
-      tag:
-        description: Release (x.x.x)
-        required: true
+
+env:
+    SIGN_KEY: ${{ secrets.SIGN_KEY }}
+    SIGN_KEY_ID: ${{ secrets.SIGN_KEY_ID }}
+    SIGN_KEY_PASS: ${{ secrets.SIGN_KEY_PASS }}
 
 jobs:
   release_maven_package:
     runs-on: ubuntu-latest
     steps:
+      - name: Validate branch
+        run: |
+          echo "Release can only be triggered from master branch"
+          exit 1
+          if: ${{ github.ref != 'refs/heads/master' }}
+
       - uses: actions/checkout@v3
 
-      - name: Update pom version
-        run: |
-          mvn -B versions:set -DnewVersion=${{ github.event.inputs.tag }} -DgenerateBackupPoms=false
+      - name: Set up jdk
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'corretto'
+          java-version: '8'
 
-      - name: Setup git config
-        run: |
-          git config user.name "GitHub Action Bot on behalf of ${{ github.actor }}"
-          git config user.email "<>"
-
-      - name: Create release tag
-        run: |
-          git tag -a ${{ github.event.inputs.tag }} -m "Release tag for ${{ github.event.inputs.tag }}"
-          git push origin ${{ github.event.inputs.tag }}
-
-      - name: Deploy maven package
-        env:
-          SIGN_KEY = ${{ secrets.SIGN_KEY }}
-          SIGN_KEY_ID = ${{ secrets.SIGN_KEY_ID }}
-          SIGN_KEY_PASS = ${{ secrets.SIGN_KEY_PASS }}
+      - name: Maven prepare release
         run: |
           mvn \
           -P release \
           -DsonatypeOssDistMgmtSnapshotsUrl=${{ secrets.SONATYPE_OSS_DIST_MGMT_SNAPSHOTS_URL }} \
-          clean deploy
+          -B clean release:prepare 
+
+      - name: Maven perform release
+        run: |
+          mvn \
+          -P release \
+          -DsonatypeOssDistMgmtSnapshotsUrl=${{ secrets.SONATYPE_OSS_DIST_MGMT_SNAPSHOTS_URL }} \
+          -B release:perform
