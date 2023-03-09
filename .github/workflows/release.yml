@@ -1,30 +1,12 @@
 name: Release maven package
 on:
   workflow_dispatch:
-    inputs:
-      tag:
-        description: Release (x.x.x)
-        required: true
 
 jobs:
   release_maven_package:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
-      - name: Update pom version
-        run: |
-          mvn -B versions:set -DnewVersion=${{ github.event.inputs.tag }} -DgenerateBackupPoms=false
-
-      - name: Setup git config
-        run: |
-          git config user.name "GitHub Action Bot on behalf of ${{ github.actor }}"
-          git config user.email "<>"
-
-      - name: Create release tag
-        run: |
-          git tag -a ${{ github.event.inputs.tag }} -m "Release tag for ${{ github.event.inputs.tag }}"
-          git push origin ${{ github.event.inputs.tag }}
 
       - name: Deploy maven package
         env:
@@ -35,4 +17,4 @@ jobs:
           mvn \
           -P release \
           -DsonatypeOssDistMgmtSnapshotsUrl=${{ secrets.SONATYPE_OSS_DIST_MGMT_SNAPSHOTS_URL }} \
-          clean deploy
+          -B release:prepare 

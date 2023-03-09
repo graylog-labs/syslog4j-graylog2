@@ -27,9 +27,9 @@
     </licenses>
 
     <scm>
-        <url>https://github.com/graylog-labs/syslog4j-graylog2</url>
-        <connection>scm:git:git@github.com:graylog-labs/syslog4j-graylog2.git</connection>
-        <developerConnection>scm:git:git@github.com:graylog-labs/syslog4j-graylog2.git</developerConnection>
+        <url>https://github.com/kodjo-anipah/syslog4j-graylog2.git</url>
+        <connection>git@github.com:kodjo-anipah/syslog4j-graylog2.git</connection>
+        <developerConnection>scm:git:git@github.com:kodjo-anipah/syslog4j-graylog2.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
@@ -182,13 +182,6 @@
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-deploy-plugin</artifactId>
-                        <configuration>
-                            <skip>true</skip>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
                         <version>3.0.1</version>
                         <executions>
@@ -215,18 +208,6 @@
                     </plugin>
                 </plugins>
             </build>
-            <distributionManagement>
-                <snapshotRepository>
-                    <id>sonatype-nexus-snapshots</id>
-                    <name>Sonatype Nexus Snapshots</name>
-                    <url>${sonatypeOssDistMgmtSnapshotsUrl}</url>
-                </snapshotRepository>
-                <repository>
-                    <id>sonatype-nexus-staging</id>
-                    <name>Nexus Release Repository</name>
-                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-                </repository>
-            </distributionManagement>
         </profile>
     </profiles>
 </project>
