@@ -2,20 +2,15 @@ name: Release maven package
 on:
   workflow_dispatch:
 
-env:
-    SIGN_KEY: ${{ secrets.SIGN_KEY }}
-    SIGN_KEY_ID: ${{ secrets.SIGN_KEY_ID }}
-    SIGN_KEY_PASS: ${{ secrets.SIGN_KEY_PASS }}
-
 jobs:
   release_maven_package:
     runs-on: ubuntu-latest
     steps:
       - name: Validate branch
+        if: ${{ github.ref != 'refs/heads/master' }}
         run: |
           echo "Release can only be triggered from master branch"
           exit 1
-          if: ${{ github.ref != 'refs/heads/master' }}
 
       - uses: actions/checkout@v3
 
@@ -24,17 +19,19 @@ jobs:
         with:
           distribution: 'corretto'
           java-version: '8'
+          server-id: sonatype-nexus-staging
+          server-username: ${{ secrets.OSSRH_USERNAME }}
+          server-password: ${{ secrets.OSSRH_PASSWORD }}
 
-      - name: Maven prepare release
+      - name: Maven release
         run: |
           mvn \
+          -B \
           -P release \
-          -DsonatypeOssDistMgmtSnapshotsUrl=${{ secrets.SONATYPE_OSS_DIST_MGMT_SNAPSHOTS_URL }} \
-          -B clean release:prepare 
-
-      - name: Maven perform release
-        run: |
-          mvn \
-          -P release \
-          -DsonatypeOssDistMgmtSnapshotsUrl=${{ secrets.SONATYPE_OSS_DIST_MGMT_SNAPSHOTS_URL }} \
-          -B release:perform
+          release:clean \
+          release:perform \
+          release:prepare 
+        env:
+          SIGN_KEY: ${{ secrets.SIGN_KEY }}
+          SIGN_KEY_ID: ${{ secrets.SIGN_KEY_ID }}
+          SIGN_KEY_PASS: ${{ secrets.SIGN_KEY_PASS }}
