@@ -33,7 +33,7 @@ jobs:
 
       - name: Maven release
         run: |
-          mvn \   
+          mvn \
           -e \
           -B \
           -P release \
