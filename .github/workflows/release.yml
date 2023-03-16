@@ -29,8 +29,8 @@ jobs:
           -B \
           -P release \
           release:clean \
-          release:perform \
-          release:prepare 
+          release:prepare \
+          release:perform
         env:
           SIGN_KEY: ${{ secrets.SIGN_KEY }}
           SIGN_KEY_ID: ${{ secrets.SIGN_KEY_ID }}
