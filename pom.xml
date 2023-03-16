@@ -118,6 +118,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.3</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -185,6 +186,9 @@
                         <groupId>org.simplify4u.plugins</groupId>
                         <artifactId>sign-maven-plugin</artifactId>
                         <version>1.0.1</version>
+                        <configuration>
+                            <skipNoKey>false</skipNoKey>
+                        </configuration>
                         <executions>
                             <execution>
                                 <goals>
