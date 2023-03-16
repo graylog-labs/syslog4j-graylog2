@@ -5,6 +5,8 @@ on:
 jobs:
   release_maven_package:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Validate branch
         if: ${{ github.ref != 'refs/heads/master' }}
@@ -23,9 +25,15 @@ jobs:
           server-username: ${{ secrets.OSSRH_USERNAME }}
           server-password: ${{ secrets.OSSRH_PASSWORD }}
 
+      - name: Configure git config
+        run: |
+          git config --global user.name 'Gary Bot 2'
+          git config --global user.email 'service-accounts@graylog.com'
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+
       - name: Maven release
         run: |
-          mvn \
+          mvn \   
           -e \
           -B \
           -P release \
