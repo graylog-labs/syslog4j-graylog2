@@ -1,0 +1,37 @@
+name: Release maven package
+on:
+  workflow_dispatch:
+
+jobs:
+  release_maven_package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate branch
+        if: ${{ github.ref != 'refs/heads/master' }}
+        run: |
+          echo "Release can only be triggered from master branch"
+          exit 1
+
+      - uses: actions/checkout@v3
+
+      - name: Set up jdk
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'corretto'
+          java-version: '8'
+          server-id: sonatype-nexus-staging
+          server-username: ${{ secrets.OSSRH_USERNAME }}
+          server-password: ${{ secrets.OSSRH_PASSWORD }}
+
+      - name: Maven release
+        run: |
+          mvn \
+          -B \
+          -P release \
+          release:clean \
+          release:perform \
+          release:prepare 
+        env:
+          SIGN_KEY: ${{ secrets.SIGN_KEY }}
+          SIGN_KEY_ID: ${{ secrets.SIGN_KEY_ID }}
+          SIGN_KEY_PASS: ${{ secrets.SIGN_KEY_PASS }}
