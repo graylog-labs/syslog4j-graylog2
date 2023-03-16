@@ -26,6 +26,7 @@ jobs:
       - name: Maven release
         run: |
           mvn \
+          -e \
           -B \
           -P release \
           release:clean \
