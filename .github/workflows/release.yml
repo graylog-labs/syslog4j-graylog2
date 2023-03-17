@@ -7,7 +7,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      pull-requests: write
     steps:
       - name: Validate branch
         if: ${{ github.ref != 'refs/heads/master' }}
@@ -22,7 +21,7 @@ jobs:
         with:
           distribution: 'corretto'
           java-version: '8'
-          server-id: sonatype-nexus-staging
+          server-id: ossrh
           server-username: ${{ secrets.OSSRH_USERNAME }}
           server-password: ${{ secrets.OSSRH_PASSWORD }}
 
@@ -34,7 +33,6 @@ jobs:
       - name: Maven release
         run: |
           mvn \
-          -e \
           -B \
           -P release \
           release:clean \
