@@ -28,8 +28,8 @@
 
     <scm>
         <url>https://github.com/graylog-labs/syslog4j-graylog2</url>
-        <connection>scm:git:git@github.com:graylog-labs/syslog4j-graylog2.git</connection>
-        <developerConnection>scm:git:git@github.com:graylog-labs/syslog4j-graylog2.git</developerConnection>
+        <connection>https://github.com/graylog-labs/syslog4j-graylog2.git</connection>
+        <developerConnection>https://github.com/graylog-labs/syslog4j-graylog2.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 

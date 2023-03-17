@@ -29,7 +29,6 @@ jobs:
         run: |
           git config --global user.name 'Gary Bot 2'
           git config --global user.email 'service-accounts@graylog.com'
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
 
       - name: Maven release
         run: |
@@ -41,6 +40,7 @@ jobs:
           release:prepare \
           release:perform
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SIGN_KEY: ${{ secrets.SIGN_KEY }}
           SIGN_KEY_ID: ${{ secrets.SIGN_KEY_ID }}
           SIGN_KEY_PASS: ${{ secrets.SIGN_KEY_PASS }}
