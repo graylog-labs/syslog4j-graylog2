@@ -7,6 +7,7 @@ import java.net.Socket;
 
 import javax.net.SocketFactory;
 
+import jdk.net.ExtendedSocketOptions;
 import org.graylog2.syslog4j.SyslogConstants;
 import org.graylog2.syslog4j.SyslogRuntimeException;
 import org.graylog2.syslog4j.impl.AbstractSyslog;
@@ -65,6 +66,18 @@ public class TCPNetSyslogWriter extends AbstractSyslogWriter {
 
         if (this.tcpNetSyslogConfig.isKeepAlive()) {
             newSocket.setKeepAlive(keepalive);
+        }
+
+        if (this.tcpNetSyslogConfig.isKeepAliveCount()) {
+            newSocket.setOption(ExtendedSocketOptions.TCP_KEEPCOUNT, tcpNetSyslogConfig.getKeepAliveCountValue());
+        }
+
+        if (this.tcpNetSyslogConfig.isKeepAliveInterval()) {
+            newSocket.setOption(ExtendedSocketOptions.TCP_KEEPINTERVAL,tcpNetSyslogConfig.getKeepAliveIntervalSeconds() );
+        }
+
+        if (this.tcpNetSyslogConfig.isKeepAliveIdle()) {
+            newSocket.setOption(ExtendedSocketOptions.TCP_KEEPIDLE,tcpNetSyslogConfig.getKeepAliveIdleSeconds() );
         }
 
         if (this.tcpNetSyslogConfig.isReuseAddress()) {
