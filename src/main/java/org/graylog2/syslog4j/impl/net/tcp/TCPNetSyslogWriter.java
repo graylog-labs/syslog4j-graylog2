@@ -126,6 +126,11 @@ public class TCPNetSyslogWriter extends AbstractSyslogWriter {
             }
         }
     }
+	
+	protected void closeSocket(Socket socketToClose, Exception exception) {
+        //Some implementations need to be able to log every exception; i.e. to meet security certification requirements
+        closeSocket(socketToClose);
+    }
 
     public void write(byte[] message) throws SyslogRuntimeException {
         Socket currentSocket = null;
@@ -169,7 +174,7 @@ public class TCPNetSyslogWriter extends AbstractSyslogWriter {
 
             } catch (IOException ioe) {
                 attempts++;
-                closeSocket(currentSocket);
+                closeSocket(currentSocket, ioe);
 
                 if (attempts >= (this.tcpNetSyslogConfig.getWriteRetries() + 1)) {
                     throw new SyslogRuntimeException(ioe);
