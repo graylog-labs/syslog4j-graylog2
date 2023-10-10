@@ -30,7 +30,6 @@ import static java.util.Objects.requireNonNull;
  */
 public class FortiGateSyslogEvent implements SyslogServerEventIF {
     private static final Pattern PRI_PATTERN = Pattern.compile("^<(\\d{1,3})>(.*)$");
-    private static final Pattern KV_PATTERN = Pattern.compile("(\\w+)=([^\\s\"]*)");
     private static final Pattern QUOTED_KV_PATTERN = Pattern.compile("(\\w+)=\"([^\"]*)\"");
 
     private String rawEvent;
@@ -85,10 +84,6 @@ public class FortiGateSyslogEvent implements SyslogServerEventIF {
 
     private void parseFields(String event) {
         final Map<String, String> fields = new HashMap<>();
-        final Matcher matcher = KV_PATTERN.matcher(event);
-        while (matcher.find()) {
-            fields.put(matcher.group(1), matcher.group(2));
-        }
         final Matcher quotedMatcher = QUOTED_KV_PATTERN.matcher(event);
         while (quotedMatcher.find()) {
             fields.put(quotedMatcher.group(1), quotedMatcher.group(2));
