@@ -29,9 +29,8 @@ import static java.util.Objects.requireNonNull;
  * @see <a href="http://help.fortinet.com/fos50hlp/54/Content/FortiOS/fortigate-logging-reporting-54/logs.htm#Log_messages">FortiGate logging and reporting overview</a>
  */
 public class FortiGateSyslogEvent implements SyslogServerEventIF {
-    private static final Pattern PRI_PATTERN = Pattern.compile("^<(\\d{1,3})>(.*)$");
-    private static final Pattern KV_PATTERN = Pattern.compile("(\\w+)=([^\\s\"]*)");
-    private static final Pattern QUOTED_KV_PATTERN = Pattern.compile("(\\w+)=\"([^\"]*)\"");
+    private static final Pattern PRI_PATTERN = Pattern.compile("^<(\\d{1,3})>(.*)");
+    private static final Pattern KV_PATTERN = Pattern.compile("(\\w+)=(?:\"([^\"]*)\"|([^\\s\"]*))");
 
     private String rawEvent;
     private ZoneId defaultZoneId;
@@ -60,7 +59,7 @@ public class FortiGateSyslogEvent implements SyslogServerEventIF {
     private void parse(String event) {
         final Matcher matcher = PRI_PATTERN.matcher(event);
         if (!matcher.find()) {
-            throw new IllegalArgumentException("Invalid Fortigate syslog message");
+            throw new IllegalArgumentException("Invalid Fortigate syslog message: " + event);
         } else {
             final String priority = matcher.group(1);
             final String message = matcher.group(2);
@@ -87,11 +86,7 @@ public class FortiGateSyslogEvent implements SyslogServerEventIF {
         final Map<String, String> fields = new HashMap<>();
         final Matcher matcher = KV_PATTERN.matcher(event);
         while (matcher.find()) {
-            fields.put(matcher.group(1), matcher.group(2));
-        }
-        final Matcher quotedMatcher = QUOTED_KV_PATTERN.matcher(event);
-        while (quotedMatcher.find()) {
-            fields.put(quotedMatcher.group(1), quotedMatcher.group(2));
+            fields.put(matcher.group(1), matcher.group(2) != null ? matcher.group(2) : matcher.group(3));
         }
         setFields(fields);
     }
