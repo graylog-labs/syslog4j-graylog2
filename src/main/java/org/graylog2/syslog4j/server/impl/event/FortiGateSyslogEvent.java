@@ -29,7 +29,7 @@ import static java.util.Objects.requireNonNull;
  * @see <a href="http://help.fortinet.com/fos50hlp/54/Content/FortiOS/fortigate-logging-reporting-54/logs.htm#Log_messages">FortiGate logging and reporting overview</a>
  */
 public class FortiGateSyslogEvent implements SyslogServerEventIF {
-    private static final Pattern PRI_PATTERN = Pattern.compile("^<(\\d{1,3})>(.*)$");
+    private static final Pattern PRI_PATTERN = Pattern.compile("^<(\\d{1,3})>(.*)");
     private static final Pattern KV_PATTERN = Pattern.compile("(\\w+)=(?:\"([^\"]*)\"|([^\\s\"]*))");
 
     private String rawEvent;
@@ -59,7 +59,7 @@ public class FortiGateSyslogEvent implements SyslogServerEventIF {
     private void parse(String event) {
         final Matcher matcher = PRI_PATTERN.matcher(event);
         if (!matcher.find()) {
-            throw new IllegalArgumentException("Invalid Fortigate syslog message");
+            throw new IllegalArgumentException("Invalid Fortigate syslog message: " + event);
         } else {
             final String priority = matcher.group(1);
             final String message = matcher.group(2);
