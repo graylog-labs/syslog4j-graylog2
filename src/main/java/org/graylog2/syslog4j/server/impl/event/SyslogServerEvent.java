@@ -11,12 +11,14 @@ import java.net.InetAddress;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Year;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.TimeZone;
 
 /**
  * SyslogServerEvent provides an implementation of the SyslogServerEventIF interface.
@@ -136,7 +138,7 @@ public class SyslogServerEvent implements SyslogServerEventIF {
     }
 
     private Date parseDateBasedOnFormat(String originalDate, int dateLength, String format) throws ParseException {
-        String year = Integer.toString(Calendar.getInstance().get(Calendar.YEAR));
+        String year = deriveEventYearFromSystemTime();
         String modifiedDate = originalDate + " " + year;
         DateFormat dateFormat = new SimpleDateFormat(format, Locale.ENGLISH);
 
@@ -145,6 +147,14 @@ public class SyslogServerEvent implements SyslogServerEventIF {
         }
 
         return dateFormat.parse(modifiedDate);
+    }
+
+    protected String deriveEventYearFromSystemTime() {
+        ZoneId zoneId = Optional.ofNullable(sysLogServerTimeZone)
+                .map(tz -> tz.toTimeZone())
+                .map(TimeZone::toZoneId)
+                .orElse(ZoneId.systemDefault());
+        return Integer.toString(Year.now(zoneId).getValue());
     }
 
     private DateTime parse8601Date(String date) {

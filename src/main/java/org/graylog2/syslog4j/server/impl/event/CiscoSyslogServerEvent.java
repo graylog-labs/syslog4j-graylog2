@@ -6,7 +6,6 @@ import java.net.InetAddress;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -147,7 +146,7 @@ public class CiscoSyslogServerEvent extends SyslogServerEvent {
 
             try {
                 if (isYearMissing) {
-                    String year = Integer.toString(Calendar.getInstance().get(Calendar.YEAR));
+                    String year = deriveEventYearFromSystemTime();
                     String modifiedDate = year + " " + originalDate;
                     final ZonedDateTime dateTime = ZonedDateTime.parse(modifiedDate, formatter);
                     this.date = Date.from(dateTime.toInstant());
