@@ -3,7 +3,7 @@
 
     <groupId>org.graylog2</groupId>
     <artifactId>syslog4j</artifactId>
-    <version>0.9.63-SNAPSHOT</version>
+    <version>0.9.62-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>syslog4j-graylog2</name>
@@ -27,6 +27,13 @@
         <url>https://github.com/graylog-labs/syslog4j-graylog2</url>
         <tag>HEAD</tag>
     </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
 
     <issueManagement>
         <system>GitHub Issues</system>
