@@ -35,6 +35,17 @@
         </repository>
     </distributionManagement>
 
+    <developers>
+        <developer>
+            <id>graylog</id>
+            <email>hello@graylog.com</email>
+            <name>Graylog, Inc.</name>
+            <roles>
+                <role>Developer</role>
+            </roles>
+        </developer>
+    </developers>
+
     <issueManagement>
         <system>GitHub Issues</system>
         <url>https://github.com/graylog-labs/syslog4j-graylog2/issues</url>
@@ -183,7 +194,8 @@
                 <jdk>[1.8,)</jdk>
             </activation>
             <properties>
-                <additionalparam>-Xdoclint:none</additionalparam>
+                <doclint>none</doclint>
+                <quiet>true</quiet>
             </properties>
         </profile>
         <profile>
