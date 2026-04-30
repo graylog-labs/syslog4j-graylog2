@@ -3,7 +3,7 @@
 
     <groupId>org.graylog2</groupId>
     <artifactId>syslog4j</artifactId>
-    <version>0.9.62-SNAPSHOT</version>
+    <version>0.9.62</version>
     <packaging>jar</packaging>
 
     <name>syslog4j-graylog2</name>
@@ -25,7 +25,7 @@
         <url>scm:git:https://github.com/graylog-labs/syslog4j-graylog2</url>
         <connection>scm:git:https://github.com/graylog-labs/syslog4j-graylog2.git</connection>
         <developerConnection>scm:git:https://github.com/graylog-labs/syslog4j-graylog2.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>syslog4j-0.9.62</tag>
     </scm>
 
     <issueManagement>
@@ -155,8 +155,8 @@
                             <fail>true</fail>
                             <failFast>false</failFast>
                             <rules>
-                                <bannedDependencies/>
-                                <banDuplicatePomDependencyVersions/>
+                                <bannedDependencies />
+                                <banDuplicatePomDependencyVersions />
                                 <requireMavenVersion>
                                     <!-- Enforce the same version we define in the maven wrapper -->
                                     <version>[3.9.6,3.99.99]</version>
