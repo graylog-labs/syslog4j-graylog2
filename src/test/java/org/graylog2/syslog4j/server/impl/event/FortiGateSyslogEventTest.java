@@ -71,4 +71,48 @@ public class FortiGateSyslogEventTest {
         assertThat(ZonedDateTime.ofInstant(event.getDate().toInstant(), mst))
                 .isEqualTo(of);
     }
+
+    @Test
+    public void quotedValueWithEqualsDoesNotProducePhantomFields() {
+        final String rawMessage = "<99>date=2025-06-12 time=13:17:12 devname=\"FW1\" tz=\"+00:00\" url=\"/p/AF1QipMv0l3HYdRc5_YuViCfIIbOZz6ipH4Jb6QV6ngM=w92-h92-n-k-no\"";
+        final FortiGateSyslogEvent event = new FortiGateSyslogEvent(rawMessage);
+
+        assertThat(event.getFields())
+                .containsEntry("url", "/p/AF1QipMv0l3HYdRc5_YuViCfIIbOZz6ipH4Jb6QV6ngM=w92-h92-n-k-no")
+                .doesNotContainKey("AF1QipMv0l3HYdRc5_YuViCfIIbOZz6ipH4Jb6QV6ngM")
+                .doesNotContainValue("w92-h92-n-k-no");
+    }
+
+    @Test
+    public void quotedValueDoesNotOverwriteSiblingFields() {
+        final String rawMessage = "<99>date=2025-06-12 time=13:17:12 devname=\"FW1\" tz=\"+00:00\" srcip=10.31.110.152 dstip=192.178.50.65 url=\"/whatever.php?srcip=127.0.0.1&dstip=127.0.0.1\"";
+        final FortiGateSyslogEvent event = new FortiGateSyslogEvent(rawMessage);
+
+        assertThat(event.getFields())
+                .containsEntry("srcip", "10.31.110.152")
+                .containsEntry("dstip", "192.178.50.65")
+                .containsEntry("url", "/whatever.php?srcip=127.0.0.1&dstip=127.0.0.1");
+    }
+
+    @Test
+    public void backslashEscapedQuoteInsideQuotedValueIsConsumedAtomically() {
+        final String rawMessage = "<99>date=2025-06-12 time=13:17:12 srcip=10.0.0.1 url=\"/test?\\\"srcip=127.0.0.1\"";
+        final FortiGateSyslogEvent event = new FortiGateSyslogEvent(rawMessage);
+
+        assertThat(event.getFields())
+                .containsEntry("srcip", "10.0.0.1")
+                .containsEntry("url", "/test?\\\"srcip=127.0.0.1");
+    }
+
+    @Test
+    public void quotedValueDoesNotCorruptParseTimeFields() {
+        final String rawMessage = "<99>date=2025-06-12 time=13:17:12 devname=\"FW1\" tz=\"+00:00\" url=\"/whatever.php?time=1\"";
+        final FortiGateSyslogEvent event = new FortiGateSyslogEvent(rawMessage);
+
+        assertThat(event.getFields())
+                .containsEntry("time", "13:17:12")
+                .containsEntry("url", "/whatever.php?time=1");
+        assertThat(ZonedDateTime.ofInstant(event.getDate().toInstant(), ZoneOffset.UTC))
+                .isEqualTo(ZonedDateTime.of(2025, 6, 12, 13, 17, 12, 0, ZoneOffset.UTC));
+    }
 }
