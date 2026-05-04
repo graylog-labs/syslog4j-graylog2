@@ -1,0 +1,38 @@
+name: "Build"
+
+on:
+  push:
+    branches:
+      - "master"
+  pull_request:
+
+defaults:
+  run:
+    shell: "bash"
+
+jobs:
+  build:
+    runs-on: "ubuntu-slim"
+
+    steps:
+      - uses: "actions/checkout@v6"
+        with:
+          persist-credentials: false
+
+      - name: "Set up JDK"
+        uses: "actions/setup-java@v5"
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: "Build"
+        env:
+          MAVEN_OPTS: >
+            -Dnetworkaddress.cache.ttl=3
+            -Dnetworkaddress.cache.negative.ttl=0
+            -DtrimStackTrace=false
+            -Djansi.force=true
+            -Dmaven.wagon.http.retryHandler.class=standard -Dmaven.wagon.http.retryHandler.count=3
+            -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
+          MAVEN_ARGS: --show-version --batch-mode --fail-fast --update-snapshots --no-transfer-progress
+        run: "./mvnw clean package"
